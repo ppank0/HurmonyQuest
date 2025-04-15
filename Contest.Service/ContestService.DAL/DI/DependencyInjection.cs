@@ -6,25 +6,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ContestService.DAL.DI
+namespace ContestService.DAL.DI;
+
+public  static class DependencyInjection
 {
-    public  static class DependencyInjection
+    public static IServiceCollection AddDalDependencies(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddDalDependencies(this IServiceCollection services, IConfiguration configuration)
-        {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContext<AppDbContext>(options =>
-                    options.UseNpgsql(connectionString, npgsqlOptions =>
-                        npgsqlOptions.EnableRetryOnFailure(
-                                        maxRetryCount: 5,
-                                        maxRetryDelay: TimeSpan.FromSeconds(10),
-                                        errorCodesToAdd: null)));
+        services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(connectionString, npgsqlOptions =>
+                    npgsqlOptions.EnableRetryOnFailure(
+                                    maxRetryCount: 5,
+                                    maxRetryDelay: TimeSpan.FromSeconds(10),
+                                    errorCodesToAdd: null)));
 
-            services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
+        services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 
-            return services;
-
-        }
+        return services;
     }
 }

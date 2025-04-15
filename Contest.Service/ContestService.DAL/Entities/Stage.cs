@@ -1,15 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ContestService.DAL.Entities;
 
-namespace ContestService.DAL.Entities
+public class Stage : BaseEntity
 {
-    internal class Stage : BaseEntity
-    {
-        [Required]
-        public string Name { get; set; } = null!;
-
-        [Required]
-        public DateTime StartDate { get; set; } = DateTime.UtcNow;
-        [Required]
-        public DateTime EndDate { get; set; } = DateTime.UtcNow.AddDays(1);
-    }
+    public required string Name { get; set; }
+    public DateTime StartDate { get; set; } = DateTime.UtcNow;
+    public DateTime EndDate { get; set; } = DateTime.UtcNow;
 }

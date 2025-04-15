@@ -1,8 +1,7 @@
-﻿namespace ContestService.DAL.Repositories.Interfaces
+﻿namespace ContestService.DAL.Repositories.Interfaces;
+
+internal interface IHasTimestamps
 {
-    internal interface IHasTimestamps
-    {
-        DateTime CreatedAt { get; set; }
-        DateTime UpdatedAt { get; set; }
-    }
+    DateTime CreatedAt { get; set; }
+    DateTime UpdatedAt { get; set; }
 }

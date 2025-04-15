@@ -1,10 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ContestService.DAL.Entities;
 
-namespace ContestService.DAL.Entities
+public class Nomination : BaseEntity
 {
-    internal class Nomination : BaseEntity
-    {
-        [Required]
-        public string Name { get; set; } = null!;
-    }
+    public required string Name { get; set; }
 }

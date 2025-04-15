@@ -1,16 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ContestService.DAL.Entities
-{
-    internal class MusicalInstrument : BaseEntity
-    {
-        [Required]
-        public string Name { get; set; } = null!;
+namespace ContestService.DAL.Entities;
 
-        [ForeignKey("Nomination")]
-        [Required]
-        public Guid NominationId { get; set; }
-        public Nomination Nomination { get; set; }
-    }
+public class MusicalInstrument : BaseEntity
+{
+    public required string Name { get; set; } 
+
+    [ForeignKey("Nomination")]
+    public Guid NominationId { get; set; }
+    public Nomination Nomination { get; set; }
 }

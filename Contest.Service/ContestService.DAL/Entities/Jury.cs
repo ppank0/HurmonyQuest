@@ -1,14 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ContestService.DAL.Entities
-{
-    internal class Jury : BaseEntity
-    {
-        public string Name { get; set; } = null!;
-        public string Surname { get; set; } = null!;
-        public DateOnly Birthday { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+namespace ContestService.DAL.Entities;
 
-        [Required]
-        public Guid UserId { get; set; }
-    }
+public class Jury : BaseEntity
+{
+    public required string Name { get; set; } 
+    public required string Surname { get; set; } 
+    public DateOnly Birthday { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    public Guid UserId { get; set; }
 }
