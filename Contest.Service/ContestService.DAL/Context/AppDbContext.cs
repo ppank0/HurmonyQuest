@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContestService.DAL.Context;
 
-internal class AppDbContext(DbContextOptions options) : DbContext(options)
+public class AppDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Stage> Stages { get; set; }
     public DbSet<Nomination> Nominations { get; set; }
