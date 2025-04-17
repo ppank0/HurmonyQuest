@@ -22,6 +22,7 @@ public  static class DependencyInjection
                                     errorCodesToAdd: null)));
 
         services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
+        services.AddScoped<INominationRepository, NominationRepository>();
 
         return services;
     }
