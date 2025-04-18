@@ -32,7 +32,7 @@ public class RepositoryBase<T>(AppDbContext context) : IRepositoryBase<T> where 
         return _context.Set<T>().AsNoTracking();
     }
 
-    public async Task<List<T>> FindByConditionToListAsync(Expression<Func<T, bool>> expression, CancellationToken ct)
+    public async Task<List<T>> FindByConditionAsync(Expression<Func<T, bool>> expression, CancellationToken ct)
     {
         return await _context.Set<T>().Where(expression).ToListAsync(ct);
     }

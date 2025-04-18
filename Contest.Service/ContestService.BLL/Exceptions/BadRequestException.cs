@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ContestService.BLL.Exceptions;
-internal class BadRequestException : Exception
+﻿namespace ContestService.BLL.Exceptions;
+public class BadRequestException(string message) : Exception(message)
 {
-    public BadRequestException(string message) : base(message) { }
 }

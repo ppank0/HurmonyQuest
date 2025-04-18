@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace ContestService.BLL.Interfaces;
 public interface INominationService
 {
-    Task<NominationModel> GetNominationByIdAsync(Guid id, CancellationToken ct);
+    Task<NominationModel> GetAsync(Guid id, CancellationToken ct);
     Task<List<NominationModel>> GetAllAsync(CancellationToken ct);
-    Task<NominationModel> DeleteNominationAsync(Guid id, CancellationToken ct);
-    Task<NominationModel> CreateNominationAsync(NominationModel nomination, CancellationToken ct);
-    Task<NominationModel> UpdateNominationAsync(NominationModel nomination, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
+    Task<NominationModel> CreateAsync(NominationModel nomination, CancellationToken ct);
+    Task<NominationModel> UpdateAsync(NominationModel nomination, CancellationToken ct);
 }

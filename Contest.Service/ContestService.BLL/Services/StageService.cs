@@ -5,10 +5,9 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
 namespace ContestService.BLL.Services;
-public class StageService(IRepositoryBase<Stage> repositoryBase) : IStageService
+public class StageService(IRepositoryBase<Stage> _repositoryBase) : IStageService
 {
-    private readonly IRepositoryBase<Stage> _repositoryBase = repositoryBase;
-    public async Task<StageModel> CreateStageAsync(StageModel stage, CancellationToken ct)
+    public async Task<StageModel> CreateAsync(StageModel stage, CancellationToken ct)
     {
         Stage createdStage = await _repositoryBase.CreateAsync(new Stage
         {
@@ -16,6 +15,7 @@ public class StageService(IRepositoryBase<Stage> repositoryBase) : IStageService
             StartDate = stage.StartDate,
             EndDate = stage.EndDate
         }, ct);
+
         return new StageModel
         {
             Id = createdStage.Id,
@@ -25,16 +25,14 @@ public class StageService(IRepositoryBase<Stage> repositoryBase) : IStageService
         };
     }
 
-    public async Task<StageModel> DeleteStageAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var query = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
-        if (query != null)
-        {
-            await _repositoryBase.DeleteAsync(query, ct);
-        }
+        var stage = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        if (stage is  null)
         {
             throw new NotFoundException($"Stage with id {id} was not found");
         }
+        await _repositoryBase.DeleteAsync(stage, ct);
     }
 
     public async Task<List<StageModel>> GetAllAsync(CancellationToken ct)
@@ -51,20 +49,29 @@ public class StageService(IRepositoryBase<Stage> repositoryBase) : IStageService
         return stageModelList;
     }
 
-    public async Task<StageModel> GetStageById(Guid id, CancellationToken ct)
+    public async Task<StageModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var stageList = await _repositoryBase.FindByConditionToListAsync(s => s.Id == id, ct);
-        Stage stage = stageList.FirstOrDefault();
-        return stage == null
-            ? throw new NotFoundException($"Stage with id {id} was not found")
-            : new StageModel {Id = stage.Id, Name = stage.Name, StartDate = stage.StartDate, EndDate = stage.EndDate };
+        var stageList = await _repositoryBase.FindByConditionAsync(s => s.Id == id, ct);
+        var stage = stageList.FirstOrDefault();
+        if (stage is null)
+        {
+            throw new NotFoundException($"Stage with id {id} was not found");
+        }
+
+        return new StageModel 
+        { 
+            Id = stage.Id, 
+            Name = stage.Name, 
+            StartDate = stage.StartDate, 
+            EndDate = stage.EndDate 
+        };
     }
 
-    public async Task<StageModel> UpdateStageAsync(StageModel stage, CancellationToken ct)
+    public async Task<StageModel> UpdateAsync(StageModel stage, CancellationToken ct)
     {
-        var stageList = await _repositoryBase.FindByConditionToListAsync(s => s.Id == stage.Id, ct);
+        var stageList = await _repositoryBase.FindByConditionAsync(s => s.Id == stage.Id, ct);
         var foundStage = stageList.FirstOrDefault();
-        if (foundStage != null)
+        if (foundStage is not null)
         {
             foundStage.Name = stage.Name;
             foundStage.StartDate = stage.StartDate;

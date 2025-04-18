@@ -9,9 +9,9 @@ namespace ContestService.BLL.Interfaces;
 public interface IMusicalInstrumentService
 {
     Task<List<MusicalInstrumentModel>> GetAllAsync(CancellationToken ct);
-    Task<MusicalInstrumentModel> GetMusicalInstrumentByIdAsync(Guid id, CancellationToken ct);
-    Task<MusicalInstrumentModel> DeleteMusicalInstrumentAsync(Guid id, CancellationToken ct);
-    Task<MusicalInstrumentModel> CreateMusicalInstrumentAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct);
-    Task<MusicalInstrumentModel> UpdateMusicalInstrumentAsync(MusicalInstrumentModel model, CancellationToken ct);
+    Task<MusicalInstrumentModel> GetAsync(Guid id, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
+    Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct);
+    Task<MusicalInstrumentModel> UpdateAsync(MusicalInstrumentModel model, CancellationToken ct);
 
 }

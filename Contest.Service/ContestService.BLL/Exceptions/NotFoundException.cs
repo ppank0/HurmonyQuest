@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ContestService.BLL.Exceptions;
-public class NotFoundException : Exception
+﻿namespace ContestService.BLL.Exceptions;
+public class NotFoundException (string message) : Exception (message)
 {
-    public NotFoundException(string message):base (message) { }
-    public NotFoundException(Guid id) : base($"Сущность с таким id: {id} не найдена") { }
+    public NotFoundException(Guid id) : this($"Entity with this id: {id} was not found") { }
 };

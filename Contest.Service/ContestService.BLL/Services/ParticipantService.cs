@@ -6,19 +6,16 @@ using ContestService.DAL.Repositories.Interfaces;
 using System.Data;
 
 namespace ContestService.BLL.Services;
-public class ParticipantService(IRepositoryBase<Participant> repositoryBase,
-                                    INominationRepository nominationRepository) : IParticipantService
+public class ParticipantService(IRepositoryBase<Participant> _repositoryBase,
+                                    INominationRepository _nominationRepository) : IParticipantService
 {
-    private readonly IRepositoryBase<Participant> _repositoryBase = repositoryBase;
-    private readonly INominationRepository _nominationRepository = nominationRepository;
-
-    public async Task<ParticipantModel> CreateParticipantAsync(ParticipantModel model, CancellationToken ct)
+    public async Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct)
     {
         if (!_nominationRepository.IsMusicalInstrumentInNomination(model.NominationId, model.MusicalInstrumentId))
         {
             throw new BadRequestException("The selected musical instrument does not correspond to the specified category.");
         }
-        Participant newParticipant = new Participant
+        var newParticipant = new Participant
         {
             Name = model.Name,
             Surname = model.Surname,
@@ -26,26 +23,27 @@ public class ParticipantService(IRepositoryBase<Participant> repositoryBase,
             MusicalInstrumentId = model.MusicalInstrumentId,
         };
 
-        var createdEntity = await _repositoryBase.CreateAsync(newParticipant, ct);
+        var createdParticipant = await _repositoryBase.CreateAsync(newParticipant, ct);
 
         return new ParticipantModel 
         {
-            Id = createdEntity.Id,
-            Name = createdEntity.Name,
-            Surname = createdEntity.Surname,
-            Birthday = createdEntity.Birthday,
-            MusicalInstrumentId= createdEntity.MusicalInstrumentId,
-            NominationId = _nominationRepository.GetNominationIdByInstrumentId(createdEntity.MusicalInstrumentId),
+            Id = createdParticipant.Id,
+            Name = createdParticipant.Name,
+            Surname = createdParticipant.Surname,
+            Birthday = createdParticipant.Birthday,
+            MusicalInstrumentId= createdParticipant.MusicalInstrumentId,
+            NominationId = _nominationRepository.GetNominationIdByInstrumentId(createdParticipant.MusicalInstrumentId),
         };
     }
 
-    public async Task DeleteParticipantAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var query = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
-        if (query != null)
+        var participant = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        if (participant is not null)
         {
-            await _repositoryBase.DeleteAsync(query, ct);
+            await _repositoryBase.DeleteAsync(participant, ct);
         }
+        else
         {
             throw new NotFoundException($"Participant with id {id} was not found");
         }
@@ -53,8 +51,8 @@ public class ParticipantService(IRepositoryBase<Participant> repositoryBase,
 
     public async Task<List<ParticipantModel>> GetAllAsync(CancellationToken ct)
     {
-        var entities = await _repositoryBase.GetAllToListAsync(ct);
-        var model = entities.Select(e => new ParticipantModel
+        var participantList = await _repositoryBase.GetAllToListAsync(ct);
+        var model = participantList.Select(e => new ParticipantModel
         {
             Id = e.Id,
             Name = e.Name,
@@ -67,33 +65,37 @@ public class ParticipantService(IRepositoryBase<Participant> repositoryBase,
         return model;
     }
 
-    public async Task<ParticipantModel> GetParticipantByIdAsync(Guid id, CancellationToken ct)
+    public async Task<ParticipantModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var resultList = await _repositoryBase.FindByConditionToListAsync(p => p.Id == id, ct);
-        Participant result = resultList.FirstOrDefault();
-        return result == null
-            ? throw new NotFoundException("entity participant was not found")
-            : new ParticipantModel()
-            {
-                Name = result.Name,
-                Surname = result.Surname,
-                Birthday = result.Birthday,
-                MusicalInstrumentId = result.MusicalInstrumentId,
-                NominationId = _nominationRepository.GetNominationIdByInstrumentId(result.MusicalInstrumentId)
-            };
+        var participantList = await _repositoryBase.FindByConditionAsync(p => p.Id == id, ct);
+        var participant = participantList.FirstOrDefault();
+
+        if (participant is null)
+        {
+            throw new NotFoundException("entity participant was not found");
+        } 
+
+        return  new ParticipantModel()
+                {
+                    Name = participant.Name,
+                    Surname = participant.Surname,
+                    Birthday = participant.Birthday,
+                    MusicalInstrumentId = participant.MusicalInstrumentId,
+                    NominationId = _nominationRepository.GetNominationIdByInstrumentId(participant.MusicalInstrumentId)
+                };
     }
 
-    public async Task<ParticipantModel> UpdateParticipantAsync(ParticipantModel model, CancellationToken ct)
+    public async Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct)
     {
-        var query = await _repositoryBase.FindByConditionToListAsync(p => p.Id == model.Id, ct);
-        Participant result = query.FirstOrDefault();
+        var participantList = await _repositoryBase.FindByConditionAsync(p => p.Id == model.Id, ct);
+        var participant = participantList.FirstOrDefault();
 
-        result.Name = model.Name;
-        result.Surname = model.Surname;
-        result.Birthday = model.Birthday;
-        result.MusicalInstrumentId = model.MusicalInstrumentId;
+        participant.Name = model.Name;
+        participant.Surname = model.Surname;
+        participant.Birthday = model.Birthday;
+        participant.MusicalInstrumentId = model.MusicalInstrumentId;
 
-        var updatedParticipant = await _repositoryBase.UpdateAsync(result, ct);
+        var updatedParticipant = await _repositoryBase.UpdateAsync(participant, ct);
 
         return new ParticipantModel
         {

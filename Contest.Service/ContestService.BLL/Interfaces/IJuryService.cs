@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace ContestService.BLL.Interfaces;
 internal interface IJuryService
 {
-    Task<JuryModel> GetJuryAsync(Guid id, CancellationToken ct);
+    Task<JuryModel> GetAsync(Guid id, CancellationToken ct);
     Task<List<JuryModel>> GetAllAsync(CancellationToken ct);
-    Task<JuryModel> CreateJuryAsync(JuryModel juryModel, CancellationToken ct);
-    Task<JuryModel> UpdateJuryAsync(JuryModel model, CancellationToken ct);
-    Task<JuryModel> DeleteJuryAsync(Guid id, CancellationToken ct);
+    Task<JuryModel> CreateAsync(JuryModel juryModel, CancellationToken ct);
+    Task<JuryModel> UpdateAsync(JuryModel model, CancellationToken ct);
+    Task DeleteAsync(Guid id, CancellationToken ct);
 }
