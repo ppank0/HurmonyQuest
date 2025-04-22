@@ -1,41 +1,28 @@
-﻿using ContestService.BLL.Exceptions;
+﻿using AutoMapper;
+using ContestService.BLL.Exceptions;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ContestService.BLL.Services;
-public class MusicalInstrumentService (IRepositoryBase<MusicalInstrument> _repositoryBase) : IMusicalInstrumentService
+public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> repository, IMapper mapper) : IMusicalInstrumentService
 {
     public async Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct)
     {
-        MusicalInstrument createdinstrument = await _repositoryBase.CreateAsync(new MusicalInstrument
-        {
-            Name = musicalInstrument.Name,
-            NominationId = musicalInstrument.Nomination.Id,
-            
-        }, ct);
+        var instrument = mapper.Map<MusicalInstrument>(musicalInstrument);
+        var createdInstrument = await repository.CreateAsync(instrument, ct);
 
-        return new MusicalInstrumentModel
-        {
-            Id = createdinstrument.Id,
-            Name = createdinstrument.Name,
-            NominationId = createdinstrument.Nomination.Id,
-        };
+        return mapper.Map<MusicalInstrumentModel>(createdInstrument);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var musicalInstrument = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var musicalInstrument = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
 
         if (musicalInstrument is not null)
         {
-            await _repositoryBase.DeleteAsync(musicalInstrument, ct);
+            await repository.DeleteAsync(musicalInstrument, ct);
         }
         else
         {
@@ -45,20 +32,14 @@ public class MusicalInstrumentService (IRepositoryBase<MusicalInstrument> _repos
 
     public async Task<List<MusicalInstrumentModel>> GetAllAsync(CancellationToken ct)
     {
-        var entitiesList = await _repositoryBase.GetAllToListAsync(ct);
-        var MusicalInstrumentModelList = entitiesList.Select(x => new MusicalInstrumentModel
-        {
-            Id = x.Id,
-            Name = x.Name,
-            NominationId = x.Nomination.Id,
-        }).ToList();
+        var entitiesList = await repository.GetAllToListAsync(ct);
 
-        return MusicalInstrumentModelList;
+        return mapper.Map<List<MusicalInstrumentModel>>(entitiesList);
     }
 
     public async Task<MusicalInstrumentModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var instrumentList = await _repositoryBase.FindByConditionAsync(s => s.Id == id, ct);
+        var instrumentList = await repository.FindByConditionAsync(s => s.Id == id, ct);
         var musicalInstrument = instrumentList.FirstOrDefault();
 
         if (musicalInstrument is null)
@@ -66,13 +47,12 @@ public class MusicalInstrumentService (IRepositoryBase<MusicalInstrument> _repos
             throw new NotFoundException($"Instrument with id {id} was not found");
         }
 
-        return new MusicalInstrumentModel 
-        { Id = musicalInstrument.Id, Name = musicalInstrument.Name, NominationId = musicalInstrument.NominationId };
+        return mapper.Map<MusicalInstrumentModel>(musicalInstrument);
     }
 
     public async Task<MusicalInstrumentModel> UpdateAsync(MusicalInstrumentModel model, CancellationToken ct)
     {
-        var instrumentList = await _repositoryBase.FindByConditionAsync(s => s.Id == model.Id, ct);
+        var instrumentList = await repository.FindByConditionAsync(s => s.Id == model.Id, ct);
         var foundInstrument = instrumentList.FirstOrDefault();
 
         if (foundInstrument is not null)
@@ -80,8 +60,13 @@ public class MusicalInstrumentService (IRepositoryBase<MusicalInstrument> _repos
             foundInstrument.Name = model.Name;
             foundInstrument.NominationId = model.NominationId;
         }
+        else
+        {
+            throw new NotFoundException($"Instrument with id {model.Id} was not found");
+        }
 
-        MusicalInstrument updated = await _repositoryBase.UpdateAsync(foundInstrument, ct);
-        return new MusicalInstrumentModel { Id = updated.Id, Name = updated.Name, NominationId = updated.NominationId};
+        MusicalInstrument updated = await repository.UpdateAsync(foundInstrument, ct);
+
+        return mapper.Map<MusicalInstrumentModel>(foundInstrument);
     }
 }

@@ -1,4 +1,5 @@
-﻿using ContestService.BLL.Exceptions;
+﻿using AutoMapper;
+using ContestService.BLL.Exceptions;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
 using ContestService.DAL.Entities;
@@ -6,42 +7,28 @@ using ContestService.DAL.Repositories.Interfaces;
 using System.Data;
 
 namespace ContestService.BLL.Services;
-public class ParticipantService(IRepositoryBase<Participant> _repositoryBase,
-                                    INominationRepository _nominationRepository) : IParticipantService
+public class ParticipantService(IRepositoryBase<Participant> repository,
+                                    INominationRepository nominationRepository, IMapper mapper) : IParticipantService
 {
     public async Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct)
     {
-        if (!_nominationRepository.IsMusicalInstrumentInNomination(model.NominationId, model.MusicalInstrumentId))
+        if (!nominationRepository.IsMusicalInstrumentInNomination(model.NominationId, model.MusicalInstrumentId))
         {
             throw new BadRequestException("The selected musical instrument does not correspond to the specified category.");
         }
-        var newParticipant = new Participant
-        {
-            Name = model.Name,
-            Surname = model.Surname,
-            Birthday = model.Birthday,
-            MusicalInstrumentId = model.MusicalInstrumentId,
-        };
 
-        var createdParticipant = await _repositoryBase.CreateAsync(newParticipant, ct);
+        var newParticipant = mapper.Map<Participant>(model);
+        var createdParticipant = await repository.CreateAsync(newParticipant, ct);
 
-        return new ParticipantModel 
-        {
-            Id = createdParticipant.Id,
-            Name = createdParticipant.Name,
-            Surname = createdParticipant.Surname,
-            Birthday = createdParticipant.Birthday,
-            MusicalInstrumentId= createdParticipant.MusicalInstrumentId,
-            NominationId = _nominationRepository.GetNominationIdByInstrumentId(createdParticipant.MusicalInstrumentId),
-        };
+        return mapper.Map<ParticipantModel>(createdParticipant);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var participant = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var participant = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
         if (participant is not null)
         {
-            await _repositoryBase.DeleteAsync(participant, ct);
+            await repository.DeleteAsync(participant, ct);
         }
         else
         {
@@ -51,59 +38,41 @@ public class ParticipantService(IRepositoryBase<Participant> _repositoryBase,
 
     public async Task<List<ParticipantModel>> GetAllAsync(CancellationToken ct)
     {
-        var participantList = await _repositoryBase.GetAllToListAsync(ct);
-        var model = participantList.Select(e => new ParticipantModel
-        {
-            Id = e.Id,
-            Name = e.Name,
-            Surname = e.Surname,
-            Birthday = e.Birthday,
-            MusicalInstrumentId = e.MusicalInstrumentId,
-            NominationId = _nominationRepository.GetNominationIdByInstrumentId(e.MusicalInstrumentId)
-        }).ToList();
+        var participantList = await repository.GetAllToListAsync(ct);
 
-        return model;
+        return mapper.Map<List<ParticipantModel>> (participantList);
     }
 
     public async Task<ParticipantModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var participantList = await _repositoryBase.FindByConditionAsync(p => p.Id == id, ct);
+        var participantList = await repository.FindByConditionAsync(p => p.Id == id, ct);
         var participant = participantList.FirstOrDefault();
 
         if (participant is null)
         {
             throw new NotFoundException("entity participant was not found");
-        } 
+        }
 
-        return  new ParticipantModel()
-                {
-                    Name = participant.Name,
-                    Surname = participant.Surname,
-                    Birthday = participant.Birthday,
-                    MusicalInstrumentId = participant.MusicalInstrumentId,
-                    NominationId = _nominationRepository.GetNominationIdByInstrumentId(participant.MusicalInstrumentId)
-                };
+        return mapper.Map<ParticipantModel>(participant);
     }
 
     public async Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct)
     {
-        var participantList = await _repositoryBase.FindByConditionAsync(p => p.Id == model.Id, ct);
+        var participantList = await repository.FindByConditionAsync(p => p.Id == model.Id, ct);
         var participant = participantList.FirstOrDefault();
+
+        if (participant is null)
+        {
+            throw new NotFoundException($"{nameof(participant)} is not found");
+        }
 
         participant.Name = model.Name;
         participant.Surname = model.Surname;
         participant.Birthday = model.Birthday;
         participant.MusicalInstrumentId = model.MusicalInstrumentId;
 
-        var updatedParticipant = await _repositoryBase.UpdateAsync(participant, ct);
+        var updatedParticipant = await repository.UpdateAsync(participant, ct);
 
-        return new ParticipantModel
-        {
-            Name = updatedParticipant.Name,
-            Surname = updatedParticipant.Surname,
-            Birthday = updatedParticipant.Birthday,
-            MusicalInstrumentId = updatedParticipant.MusicalInstrumentId,
-            NominationId = _nominationRepository.GetNominationIdByInstrumentId(updatedParticipant.MusicalInstrumentId)
-        };
+        return mapper.Map<ParticipantModel>(updatedParticipant);
     }
 }

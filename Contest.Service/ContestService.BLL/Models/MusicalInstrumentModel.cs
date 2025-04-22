@@ -6,5 +6,5 @@ public class MusicalInstrumentModel : ModelBase
 {
     public required string Name { get; set; }
     public Guid NominationId { get; set; }
-    public NominationModel Nomination { get; set; }
+    public NominationModel? Nomination { get; set; }
 }

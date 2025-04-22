@@ -1,4 +1,5 @@
-﻿using ContestService.BLL.Exceptions;
+﻿using AutoMapper;
+using ContestService.BLL.Exceptions;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
 using ContestService.DAL.Entities;
@@ -10,21 +11,23 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ContestService.BLL.Services;
-public class NominationService(IRepositoryBase<Nomination> _repositoryBase) : INominationService
+public class NominationService(IRepositoryBase<Nomination> repository, IMapper mapper) : INominationService
 {
     public async Task<NominationModel> CreateAsync(NominationModel nomination, CancellationToken ct)
     {
-        var newNomination = new Nomination { Name = nomination.Name };
-        var createdNomination = await _repositoryBase.CreateAsync(newNomination, ct);
-        return new NominationModel { Id = createdNomination.Id, Name = createdNomination.Name };
+        var newNomination = mapper.Map<Nomination>(nomination);
+        var createdNomination = await repository.CreateAsync(newNomination, ct);
+
+        return mapper.Map<NominationModel>(createdNomination);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var nomination = _repositoryBase.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var nomination = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+
         if (nomination is not null)
         {
-            await _repositoryBase.DeleteAsync(nomination, ct);
+            await repository.DeleteAsync(nomination, ct);
         }
         else
         {
@@ -34,20 +37,16 @@ public class NominationService(IRepositoryBase<Nomination> _repositoryBase) : IN
 
     public async Task<List<NominationModel>> GetAllAsync(CancellationToken ct)
     {
-        var entitiesList = await _repositoryBase.GetAllToListAsync(ct);
-        var nominationModelList = entitiesList.Select(x => new NominationModel
-        {
-            Id = x.Id,
-            Name = x.Name
-        }).ToList();
+        var entitiesList = await repository.GetAllToListAsync(ct);
 
-        return nominationModelList;
+        return mapper.Map<List<NominationModel>>(entitiesList);
     }
 
     public async Task<NominationModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var nominationList = await _repositoryBase.FindByConditionAsync(s => s.Id == id, ct);
+        var nominationList = await repository.FindByConditionAsync(s => s.Id == id, ct);
         Nomination nomination = nominationList.FirstOrDefault();
+
         if( nomination is null)
         {
             throw new NotFoundException($"Nomination with id {id} was not found");
@@ -58,14 +57,17 @@ public class NominationService(IRepositoryBase<Nomination> _repositoryBase) : IN
 
     public async Task<NominationModel> UpdateAsync(NominationModel nomination, CancellationToken ct)
     {
-        var nominationList = await _repositoryBase.FindByConditionAsync(s => s.Id == nomination.Id, ct);
+        var nominationList = await repository.FindByConditionAsync(s => s.Id == nomination.Id, ct);
         var foundNomination = nominationList.FirstOrDefault();
+
         if (foundNomination is null)
         {
             throw new NotFoundException($"Nomination with id {nomination.Id} was not found");
         }
+
         foundNomination.Name = nomination.Name;
-        Nomination updated = await _repositoryBase.UpdateAsync(foundNomination, ct);
+        Nomination updated = await repository.UpdateAsync(foundNomination, ct);
+
         return new NominationModel { Id = updated.Id, Name = updated.Name};
     }
 }

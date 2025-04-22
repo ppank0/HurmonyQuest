@@ -3,5 +3,5 @@
 public class NominationModel : ModelBase
 {
     public required string Name { get; set; }
-    public List<MusicalInstrumentModel> musicalInstrumentModels { get; set; }
+    public List<MusicalInstrumentModel>? musicalInstrumentModels { get; set; }
 }

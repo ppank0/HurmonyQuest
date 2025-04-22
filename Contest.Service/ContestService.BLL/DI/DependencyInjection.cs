@@ -1,4 +1,5 @@
 ﻿using ContestService.BLL.Interfaces;
+using ContestService.BLL.Mapper;
 using ContestService.BLL.Services;
 using ContestService.DAL.DI;
 using ContestService.DAL.Repositories.Implementations;
@@ -18,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<IParticipantService, ParticipantService>();
         services.AddScoped<IMusicalInstrumentService, MusicalInstrumentService>();
         services.AddScoped<IStageService, StageService>();
+        services.AddAutoMapper(typeof(MappingProfile));
 
         return services;
     }
