@@ -4,7 +4,6 @@ using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
-using System.Data;
 
 namespace ContestService.BLL.Services;
 public class ParticipantService(IRepositoryBase<Participant> repository,
@@ -40,7 +39,7 @@ public class ParticipantService(IRepositoryBase<Participant> repository,
     {
         var participantList = await repository.GetAllToListAsync(ct);
 
-        return mapper.Map<List<ParticipantModel>> (participantList);
+        return mapper.Map<List<ParticipantModel>>(participantList);
     }
 
     public async Task<ParticipantModel> GetAsync(Guid id, CancellationToken ct)
@@ -59,19 +58,15 @@ public class ParticipantService(IRepositoryBase<Participant> repository,
     public async Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct)
     {
         var participantList = await repository.FindByConditionAsync(p => p.Id == model.Id, ct);
-        var participant = participantList.FirstOrDefault();
+        var entityToUpdate = participantList.FirstOrDefault();
 
-        if (participant is null)
+        if (entityToUpdate is null)
         {
-            throw new NotFoundException($"{nameof(participant)} is not found");
+            throw new NotFoundException($"{nameof(entityToUpdate)} is not found");
         }
 
-        participant.Name = model.Name;
-        participant.Surname = model.Surname;
-        participant.Birthday = model.Birthday;
-        participant.MusicalInstrumentId = model.MusicalInstrumentId;
-
-        var updatedParticipant = await repository.UpdateAsync(participant, ct);
+        mapper.Map(model, entityToUpdate);
+        var updatedParticipant = await repository.UpdateAsync(entityToUpdate, ct);
 
         return mapper.Map<ParticipantModel>(updatedParticipant);
     }

@@ -12,8 +12,4 @@ public class NominationRepository(AppDbContext context) : RepositoryBase<Nominat
 
     }
 
-    public Guid GetNominationIdByInstrumentId(Guid instrumentId)
-    {
-        return _context.Nominations.Where(x => x.Instruments.Any(i => i.Id == instrumentId)).Select(n => n.Id).FirstOrDefault();
-    }
 }

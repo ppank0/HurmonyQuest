@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ContestService.BLL.Interfaces;
-internal interface IJuryService
+public interface IJuryService
 {
     Task<JuryModel> GetAsync(Guid id, CancellationToken ct);
     Task<List<JuryModel>> GetAllAsync(CancellationToken ct);

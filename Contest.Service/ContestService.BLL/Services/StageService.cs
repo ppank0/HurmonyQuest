@@ -51,20 +51,14 @@ public class StageService(IRepositoryBase<Stage> repository, IMapper mapper) : I
     public async Task<StageModel> UpdateAsync(StageModel stage, CancellationToken ct)
     {
         var stageList = await repository.FindByConditionAsync(s => s.Id == stage.Id, ct);
-        var foundStage = stageList.FirstOrDefault();
+        var entityToUpdate = stageList.FirstOrDefault();
 
-        if (foundStage is not null)
-        {
-            foundStage.Name = stage.Name;
-            foundStage.StartDate = stage.StartDate;
-            foundStage.EndDate = stage.EndDate;
-        }
-        else
-        {
+        if (entityToUpdate is null)
+        { 
             throw new NotFoundException($"Stage with id {stage.Id} was not found");
         }
-
-        Stage updated = await repository.UpdateAsync(foundStage, ct);
+        mapper.Map(stage, entityToUpdate);
+        Stage updated = await repository.UpdateAsync(entityToUpdate, ct);
 
         return mapper.Map<StageModel>(updated);
     }

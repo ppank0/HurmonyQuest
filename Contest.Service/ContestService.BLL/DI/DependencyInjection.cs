@@ -2,8 +2,6 @@
 using ContestService.BLL.Mapper;
 using ContestService.BLL.Services;
 using ContestService.DAL.DI;
-using ContestService.DAL.Repositories.Implementations;
-using ContestService.DAL.Repositories.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

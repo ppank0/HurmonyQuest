@@ -51,18 +51,16 @@ public class JuryService(IRepositoryBase<Jury> repository, IMapper mapper) : IJu
     public async Task<JuryModel> UpdateAsync(JuryModel model, CancellationToken ct)
     {
         var juryList = await repository.FindByConditionAsync(j => j.Id == model.Id, ct);
-        Jury? result = juryList.FirstOrDefault();
+        Jury? entityToUpdate = juryList.FirstOrDefault();
 
-        if(result is null)
+        if(entityToUpdate is null)
         {
             throw new NotFoundException($"Jury with with {model.Id}");
         }
 
-        result.Name = model.Name;
-        result.Surname = model.Surname;
-        result.Birthday = model.Birthday;
+        mapper.Map(model, entityToUpdate);
 
-        var updatedJury = await repository.UpdateAsync(result, ct);
+        var updatedJury = await repository.UpdateAsync(entityToUpdate, ct);
 
         return mapper.Map<JuryModel>(updatedJury);
     }

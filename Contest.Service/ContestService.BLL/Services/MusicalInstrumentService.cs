@@ -53,20 +53,16 @@ public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> reposit
     public async Task<MusicalInstrumentModel> UpdateAsync(MusicalInstrumentModel model, CancellationToken ct)
     {
         var instrumentList = await repository.FindByConditionAsync(s => s.Id == model.Id, ct);
-        var foundInstrument = instrumentList.FirstOrDefault();
+        var entityToUpdate = instrumentList.FirstOrDefault();
 
-        if (foundInstrument is not null)
-        {
-            foundInstrument.Name = model.Name;
-            foundInstrument.NominationId = model.NominationId;
-        }
-        else
+        if (entityToUpdate is null)
         {
             throw new NotFoundException($"Instrument with id {model.Id} was not found");
         }
 
-        MusicalInstrument updated = await repository.UpdateAsync(foundInstrument, ct);
+        mapper.Map(model, entityToUpdate);
+        MusicalInstrument updated = await repository.UpdateAsync(entityToUpdate, ct);
 
-        return mapper.Map<MusicalInstrumentModel>(foundInstrument);
+        return mapper.Map<MusicalInstrumentModel>(entityToUpdate);
     }
 }
