@@ -9,5 +9,5 @@ public class MusicalInstrument : BaseEntity
 
     [ForeignKey("Nomination")]
     public Guid NominationId { get; set; }
-    public Nomination Nomination { get; set; }
+    public Nomination? Nomination { get; set; }
 }
