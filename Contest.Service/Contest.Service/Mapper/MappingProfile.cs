@@ -1,0 +1,29 @@
+﻿using AutoMapper;
+using ContestService.API.DTO.JuryDtos;
+using ContestService.API.DTO.MusicalInstrumentDtos;
+using ContestService.API.DTO.NominationDtos;
+using ContestService.API.DTO.ParticipantDtos;
+using ContestService.API.DTO.StageDtos;
+using ContestService.BLL.Models;
+
+namespace ContestService.API.Mapper;
+
+public class MappingProfile : Profile
+{
+    public MappingProfile()
+    {
+        CreateMap<NominationDto, NominationModel>().ReverseMap();
+        CreateMap<NominationModel, NominationDto>();
+
+        CreateMap<JuryDto, JuryModel>().ReverseMap();
+        CreateMap<JuryModel, JuryEditDto>();
+
+        CreateMap<StageDto, StageModel>().ReverseMap();
+
+        CreateMap<ParticipantDto, ParticipantModel>().ReverseMap();
+        CreateMap<ParticipantEditDto, ParticipantModel>();
+
+        CreateMap<MusicalInstrumentDto, MusicalInstrumentModel>().ReverseMap();
+
+    }
+}
