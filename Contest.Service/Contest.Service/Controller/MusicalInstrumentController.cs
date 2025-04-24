@@ -1,21 +1,19 @@
 ﻿using AutoMapper;
-using ContestService.API.DTO.JuryDtos;
 using ContestService.API.DTO.MusicalInstrumentDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
-using ContestService.BLL.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
-[Route("api/[controller]")]
+
+[Route("api/instruments")]
 [ApiController]
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
     public async Task<List<MusicalInstrumentDto>> GetAll(CancellationToken ct)
     {
-        var instruments= await instrumentService.GetAllAsync(ct);
+        var instruments = await instrumentService.GetAllAsync(ct);
 
         return mapper.Map<List<MusicalInstrumentDto>>(instruments);
     }
@@ -29,7 +27,7 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
     }
 
     [HttpPost]
-    public async Task<MusicalInstrumentDto> Create([FromForm] MusicalInstrumentDto instrumentDto, CancellationToken ct)
+    public async Task<MusicalInstrumentDto> Create([FromBody] MusicalInstrumentDto instrumentDto, CancellationToken ct)
     {
         var instrument = mapper.Map<MusicalInstrumentModel>(instrumentDto);
         var result = await instrumentService.CreateAsync(instrument, ct);
@@ -38,7 +36,7 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
     }
 
     [HttpPut("{id}")]
-    public async Task<MusicalInstrumentDto> Update(Guid id, MusicalInstrumentDto instrumentDto, CancellationToken ct)
+    public async Task<MusicalInstrumentDto> Update(Guid id, [FromBody] MusicalInstrumentDto instrumentDto, CancellationToken ct)
     {
         var instrumentModel = await instrumentService.GetAsync(id, ct);
         mapper.Map(instrumentDto, instrumentModel);

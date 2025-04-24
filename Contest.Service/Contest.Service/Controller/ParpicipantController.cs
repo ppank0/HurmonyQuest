@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
 using ContestService.API.DTO.ParticipantDtos;
-using ContestService.API.DTO.StageDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
-using ContestService.BLL.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
-[Route("api/[controller]")]
+
+[Route("api/participants")]
 [ApiController]
 public class ParpicipantController(IParticipantService participantService, IMapper mapper) : ControllerBase
 {
@@ -29,7 +27,7 @@ public class ParpicipantController(IParticipantService participantService, IMapp
     }
 
     [HttpPost]
-    public async Task<ParticipantDto> Create([FromForm] ParticipantEditDto participantDto, CancellationToken ct)
+    public async Task<ParticipantDto> Create([FromBody] ParticipantEditDto participantDto, CancellationToken ct)
     {
         var participantModel = mapper.Map<ParticipantModel>(participantDto);
         var result = await participantService.CreateAsync(participantModel, ct);

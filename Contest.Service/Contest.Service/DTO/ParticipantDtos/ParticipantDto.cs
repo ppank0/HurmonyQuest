@@ -1,5 +1,4 @@
 ﻿using ContestService.API.DTO.MusicalInstrumentDtos;
-using ContestService.BLL.Models;
 
 namespace ContestService.API.DTO.ParticipantDtos;
 

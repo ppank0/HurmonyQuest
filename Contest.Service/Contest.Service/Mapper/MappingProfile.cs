@@ -13,10 +13,10 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<NominationDto, NominationModel>().ReverseMap();
-        CreateMap<NominationModel, NominationDto>();
+        CreateMap<NominationEditDto, NominationModel>();
 
         CreateMap<JuryDto, JuryModel>().ReverseMap();
-        CreateMap<JuryModel, JuryEditDto>();
+        CreateMap<JuryModel, JuryEditDto>().ReverseMap();
 
         CreateMap<StageDto, StageModel>().ReverseMap();
 

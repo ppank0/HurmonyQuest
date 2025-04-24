@@ -5,7 +5,8 @@ using ContestService.BLL.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
-[Route("api/[controller]")]
+
+[Route("api/nominations")]
 [ApiController]
 public class NominationController(INominationService nominationService, IMapper mapper) : ControllerBase
 {
@@ -26,7 +27,7 @@ public class NominationController(INominationService nominationService, IMapper 
     }
 
     [HttpPost]
-    public async Task<NominationDto> Create([FromForm] NominationDto nominationDto, CancellationToken ct)
+    public async Task<NominationDto> Create([FromBody] NominationEditDto nominationDto, CancellationToken ct)
     {
         var nominationModel = mapper.Map<NominationModel>(nominationDto);
         var result = await nominationService.CreateAsync(nominationModel, ct);

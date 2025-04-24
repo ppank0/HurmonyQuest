@@ -5,7 +5,8 @@ using ContestService.BLL.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
-[Route("api/[controller]")]
+
+[Route("api/juries")]
 [ApiController]
 public class JuryController(IMapper mapper, IJuryService juryService) : ControllerBase
 {
@@ -26,7 +27,7 @@ public class JuryController(IMapper mapper, IJuryService juryService) : Controll
     }
 
     [HttpPost]
-    public async Task<JuryEditDto> Create([FromForm] JuryEditDto juryDto, CancellationToken ct)
+    public async Task<JuryEditDto> Create([FromBody] JuryEditDto juryDto, CancellationToken ct)
     {
         var jury = mapper.Map<JuryModel>(juryDto);
         var result = await juryService.CreateAsync(jury, ct);
@@ -35,7 +36,7 @@ public class JuryController(IMapper mapper, IJuryService juryService) : Controll
     }
 
     [HttpPut("{id}")]
-    public async Task<JuryEditDto> Update(Guid id, JuryEditDto juryDto, CancellationToken ct)
+    public async Task<JuryEditDto> Update(Guid id, [FromBody] JuryEditDto juryDto, CancellationToken ct)
     {
         var juryModel = await juryService.GetAsync(id, ct);
         mapper.Map(juryDto, juryModel);

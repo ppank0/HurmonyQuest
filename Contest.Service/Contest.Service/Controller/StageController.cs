@@ -5,7 +5,8 @@ using ContestService.BLL.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
-[Route("api/[controller]")]
+
+[Route("api/stages")]
 [ApiController]
 public class StageController(IStageService stageService, IMapper mapper) : ControllerBase
 {
@@ -26,7 +27,7 @@ public class StageController(IStageService stageService, IMapper mapper) : Contr
     }
 
     [HttpPost]
-    public async Task<StageDto> Create([FromForm] StageDto stageDto, CancellationToken ct)
+    public async Task<StageDto> Create([FromBody] StageDto stageDto, CancellationToken ct)
     {
         var stageModel = mapper.Map<StageModel>(stageDto);
         var result = await stageService.CreateAsync(stageModel, ct);
