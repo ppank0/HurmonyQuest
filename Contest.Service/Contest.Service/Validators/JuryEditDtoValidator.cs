@@ -1,4 +1,5 @@
 ﻿using ContestService.API.DTO.JuryDtos;
+using ContestService.API.Extensions;
 using FluentValidation;
 
 namespace ContestService.API.Validators;
@@ -7,19 +8,10 @@ public class JuryEditDtoValidator : AbstractValidator<JuryEditDto>
 {
     public JuryEditDtoValidator()
     {
-        RuleFor(model => model.Name).NotEmpty().WithMessage("Name is required.")
-            .Length(2, 50).WithMessage("Name must be between 2 and 50 characters.");
+        RuleFor(model => model.Name).CommonNameRules();
 
-        RuleFor(model => model.Surname).NotEmpty().WithMessage("Surname is required.")
-            .Length(2, 50).WithMessage("Surname must be between 2 and 50 characters.");
+        RuleFor(model => model.Surname).CommonSurnameRules();
 
-        RuleFor(model => model.Birthday).Must(birthday =>
-        {
-            var today = DateOnly.FromDateTime(DateTime.Today);
-            var age = today.Year - birthday.Year;
-            if (birthday > today.AddYears(-age)) age--;
-            return age >= 18 && age <= 120;
-        })
-            .WithMessage("Age must be between 18 and 120 years.");
+        RuleFor(model => model.Birthday).CommonBirthdayRules();
     }
 }
