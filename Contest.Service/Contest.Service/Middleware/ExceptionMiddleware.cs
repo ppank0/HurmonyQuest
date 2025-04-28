@@ -1,5 +1,6 @@
 ﻿using ContestService.BLL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Text.Json;
 
 namespace ContestService.API.Middleware;
@@ -12,35 +13,32 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         {
             await next(httpContext);
         }
-        catch (NotFoundException ex)
-        {
-            await HandleException(httpContext, ex, StatusCodes.Status404NotFound);
-        }
-        catch (BadRequestException ex)
-        {
-            await HandleException(httpContext, ex, StatusCodes.Status400BadRequest);
-        }
         catch (Exception ex)
         {
-            await HandleException(httpContext, ex, StatusCodes.Status500InternalServerError);
+            await HandleException(httpContext, ex);
         }
     }
 
-    private async Task HandleException(HttpContext context, Exception ex, int statusCode)
+    private async Task HandleException(HttpContext context, Exception ex)
     {
         logger.LogError(ex, "Unhandle exception");
 
+        var (statusCode, message) = ex switch
+        {
+            NotFoundException  notFoundException=> (HttpStatusCode.NotFound, notFoundException.Message),
+            BadRequestException badRequestException=> (HttpStatusCode.BadRequest, badRequestException.Message),
+            _ => (HttpStatusCode.InternalServerError, ex.Message)
+        };
+
         ProblemDetails details = new()
         {
-            Status = statusCode,
+            Status = (int)statusCode,
             Title = ex.Message,
         };
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = details.Status.Value;
 
-        string jsonProblem = JsonSerializer.Serialize(details);
-
-        await context.Response.WriteAsync(jsonProblem);
+        await context.Response.WriteAsJsonAsync(details);
     }
 }
