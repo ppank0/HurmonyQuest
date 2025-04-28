@@ -1,7 +1,6 @@
 ﻿using ContestService.BLL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Text.Json;
 
 namespace ContestService.API.Middleware;
 
@@ -25,8 +24,8 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
 
         var (statusCode, message) = ex switch
         {
-            NotFoundException  notFoundException=> (HttpStatusCode.NotFound, notFoundException.Message),
-            BadRequestException badRequestException=> (HttpStatusCode.BadRequest, badRequestException.Message),
+            NotFoundException => (HttpStatusCode.NotFound, ex.Message),
+            BadRequestException => (HttpStatusCode.BadRequest, ex.Message),
             _ => (HttpStatusCode.InternalServerError, ex.Message)
         };
 
