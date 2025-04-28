@@ -1,5 +1,7 @@
 using ContestService.API.DI;
+using ContestService.API.Middleware;
 using ContestService.BLL.DI;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +15,8 @@ builder.Services.AddApiServices(builder.Configuration);
 builder.Services.AddBllServices(builder.Configuration);
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
