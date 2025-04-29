@@ -196,6 +196,9 @@ Icon?
 # Visual Studio temp something
 .vs/
 
+#Logs
+logs/
+
 # dotnet stuff
 project.lock.json
 .env
