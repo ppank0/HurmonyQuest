@@ -1,6 +1,8 @@
-﻿using ContestService.DAL.Entities;
+﻿using Bogus.DataSets;
+using ContestService.DAL.Entities;
 using ContestService.DAL.Interceptors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ContestService.DAL.Context;
 
@@ -15,5 +17,19 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(new TimestampInterceptor());
+        optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        DataGenerator.InitBogusData();
+
+        modelBuilder.Entity<Jury>().HasData(DataGenerator.Juries);
+        modelBuilder.Entity<Stage>().HasData(DataGenerator.Stages);
+        modelBuilder.Entity<Nomination>().HasData(DataGenerator.Nominations);
+        modelBuilder.Entity<MusicalInstrument>().HasData(DataGenerator.MusicalInstruments);
+        modelBuilder.Entity<Participant>().HasData(DataGenerator.Participants);
     }
 }
