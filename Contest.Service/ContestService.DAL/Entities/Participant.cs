@@ -12,6 +12,4 @@ public class Participant : BaseEntity
     public Guid MusicalInstrumentId { get; set; }
     public MusicalInstrument? MusicalInstrument { get; set; }
     public Guid UserId { get; set; }
-
-
 }

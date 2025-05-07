@@ -19,11 +19,12 @@ public class MappingProfile : Profile
         CreateMap<JuryModel, JuryEditDto>().ReverseMap();
 
         CreateMap<StageDto, StageModel>().ReverseMap();
+        CreateMap<StageEditDto, StageModel>();
 
         CreateMap<ParticipantDto, ParticipantModel>().ReverseMap();
         CreateMap<ParticipantEditDto, ParticipantModel>();
 
         CreateMap<MusicalInstrumentDto, MusicalInstrumentModel>().ReverseMap();
-
+        CreateMap<MusicalInstrumentEditDto, MusicalInstrumentModel>();  
     }
 }

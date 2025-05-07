@@ -6,5 +6,5 @@ public record NominationDto
 (
     Guid Id,
     string Name,
-    List<MusicalInstrumentDto>? MusicalInstrumentDtos
+    List<MusicalInstrumentDto>? MusicalInstruments
 );
