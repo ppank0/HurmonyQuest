@@ -27,7 +27,7 @@ public class StageController(IStageService stageService, IMapper mapper) : Contr
     }
 
     [HttpPost]
-    public async Task<StageDto> Create([FromBody] StageDto stageDto, CancellationToken ct)
+    public async Task<StageDto> Create([FromBody] StageEditDto stageDto, CancellationToken ct)
     {
         var stageModel = mapper.Map<StageModel>(stageDto);
         var result = await stageService.CreateAsync(stageModel, ct);
@@ -36,7 +36,7 @@ public class StageController(IStageService stageService, IMapper mapper) : Contr
     }
 
     [HttpPut("{id}")]
-    public async Task<StageDto> Update(Guid id, [FromBody] StageDto stageDto, CancellationToken ct)
+    public async Task<StageDto> Update(Guid id, [FromBody] StageEditDto stageDto, CancellationToken ct)
     {
         var stageModel = await stageService.GetAsync(id, ct);
         mapper.Map(stageDto, stageModel);

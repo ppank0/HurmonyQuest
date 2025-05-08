@@ -27,7 +27,7 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
     }
 
     [HttpPost]
-    public async Task<MusicalInstrumentDto> Create([FromBody] MusicalInstrumentDto instrumentDto, CancellationToken ct)
+    public async Task<MusicalInstrumentDto> Create([FromBody] MusicalInstrumentEditDto instrumentDto, CancellationToken ct)
     {
         var instrument = mapper.Map<MusicalInstrumentModel>(instrumentDto);
         var result = await instrumentService.CreateAsync(instrument, ct);
@@ -36,7 +36,7 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
     }
 
     [HttpPut("{id}")]
-    public async Task<MusicalInstrumentDto> Update(Guid id, [FromBody] MusicalInstrumentDto instrumentDto, CancellationToken ct)
+    public async Task<MusicalInstrumentDto> Update(Guid id, [FromBody] MusicalInstrumentEditDto instrumentDto, CancellationToken ct)
     {
         var instrumentModel = await instrumentService.GetAsync(id, ct);
         mapper.Map(instrumentDto, instrumentModel);

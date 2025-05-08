@@ -12,7 +12,6 @@ public static class DependencyInjection
     {
         services.AddAutoMapper(typeof(MappingProfile));
         services.AddAutoValidation();
-
     }
     public static void AddAutoValidation(this IServiceCollection services)
     {
