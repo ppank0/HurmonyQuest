@@ -1,5 +1,4 @@
 ﻿using ContestService.DAL.Context;
-using ContestService.DAL.Interceptors;
 using ContestService.DAL.Repositories.Implementations;
 using ContestService.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ContestService.DAL.DI;
 
-public  static class DependencyInjection
+public static class DependencyInjection
 {
     public static IServiceCollection AddDalDependencies(this IServiceCollection services, IConfiguration configuration)
     {
@@ -21,9 +20,15 @@ public  static class DependencyInjection
                                     maxRetryDelay: TimeSpan.FromSeconds(10),
                                     errorCodesToAdd: null)));
 
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("RedisConnection");
+            options.InstanceName = "ContestService_";
+        });
+
         services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
         services.AddScoped<INominationRepository, NominationRepository>();
-
+        
         return services;
     }
 }
