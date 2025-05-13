@@ -19,10 +19,10 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore src/HarmonyQuest/Contest.Service/Contest.Service.sln
+      run: dotnet restore HarmonyQuest/Contest.Service/Contest.Service.sln
 
     - name: Build
-      run: dotnet build src/HarmonyQuest/Contest.Service/Contest.Service.sln --no-restore --configuration Release
+      run: dotnet build HarmonyQuest/Contest.Service/Contest.Service.sln --no-restore --configuration Release
 
   analyze:
     runs-on: ubuntu-latest
@@ -38,6 +38,6 @@ jobs:
         sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
         sonarProjectName: ${{ vars.SONARPROJECTNAME }}
         sonarOrganization: ${{ vars.SONARORGANIZATION }}
-        dotnetBuildArguments: --configuration Release
+        dotnetBuildArguments: HarmonyQuest/Contest.Service/Contest.Service.sln --configuration Release
     env: 
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
