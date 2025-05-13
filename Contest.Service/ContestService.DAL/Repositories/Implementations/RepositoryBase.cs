@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace ContestService.DAL.Repositories.Implementations;
 
-public class RepositoryBase<T>(AppDbContext context, IDistributedCache cache) : IRepositoryBase<T> where T : class
+public class RepositoryBase<T>(AppDbContext context) : IRepositoryBase<T> where T : class
 {
     protected readonly AppDbContext _context = context;
 
@@ -47,23 +47,6 @@ public class RepositoryBase<T>(AppDbContext context, IDistributedCache cache) : 
 
     public async Task<List<T>> GetAllToListAsync(CancellationToken ct)
     {
-        var cacheKey = $"{typeof(T).Name}_GetAllAsync";
-       
-        string? cachedData = await cache.GetStringAsync(cacheKey, ct);
-        if (cachedData is not null)
-        {
-            return JsonSerializer.Deserialize<List<T>>(cachedData)!;
-        }
-
-        var result = await _context.Set<T>().ToListAsync(ct);
-
-        await cache.SetStringAsync(cacheKey,
-            JsonSerializer.Serialize(result),
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
-            }, ct);
-
-        return result;
+        return await _context.Set<T>().ToListAsync(ct);
     }
 }

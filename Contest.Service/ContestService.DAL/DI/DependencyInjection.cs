@@ -1,4 +1,5 @@
 ﻿using ContestService.DAL.Context;
+using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Implementations;
 using ContestService.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -26,9 +27,23 @@ public static class DependencyInjection
             options.InstanceName = "ContestService_";
         });
 
-        services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
+        services.AddScoped<IRepositoryBase<Jury>, RepositoryBase<Jury>>();
+        services.Decorate<IRepositoryBase<Jury>, CachedRepositoryDecorator<Jury>>();
+
+        services.AddScoped<IRepositoryBase<MusicalInstrument>, RepositoryBase<MusicalInstrument>>();
+        services.Decorate<IRepositoryBase<MusicalInstrument>, CachedRepositoryDecorator<MusicalInstrument>>();
+
+        services.AddScoped<IRepositoryBase<Nomination>, RepositoryBase<Nomination>>();
+        services.Decorate<IRepositoryBase<Nomination>, CachedRepositoryDecorator<Nomination>>();
+
+        services.AddScoped<IRepositoryBase<Participant>, RepositoryBase<Participant>>();
+        services.Decorate<IRepositoryBase<Participant>, CachedRepositoryDecorator<Participant>>();
+
+        services.AddScoped<IRepositoryBase<Stage>, RepositoryBase<Stage>>();
+        services.Decorate<IRepositoryBase<Stage>, CachedRepositoryDecorator<Stage>>();
+
         services.AddScoped<INominationRepository, NominationRepository>();
-        
+
         return services;
     }
 }
