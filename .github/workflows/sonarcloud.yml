@@ -1,0 +1,43 @@
+name: .NET with SonarCloud
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+  analyze:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Sonar Scan
+      uses: highbyte/sonarscan-dotnet@v2.3.0
+      with:
+        sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
+        sonarProjectName: ${{ vars.SONARPROJECTNAME }}
+        sonarOrganization: ${{ vars.SONARORGANIZATION }}
+        dotnetBuildArguments: --configuration Release
+    env: 
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
