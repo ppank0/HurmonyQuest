@@ -21,10 +21,12 @@ public static class DependencyInjection
                                     maxRetryDelay: TimeSpan.FromSeconds(10),
                                     errorCodesToAdd: null)));
 
+        var redisSection = configuration.GetSection("RedisCacheSettings");
+
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = configuration.GetConnectionString("RedisConnection");
-            options.InstanceName = "ContestService_";
+            options.Configuration = redisSection["ConnectionString"];
+            options.InstanceName = redisSection["InstanceName"];
         });
 
         services.AddScoped<IRepositoryBase<Jury>, RepositoryBase<Jury>>();
