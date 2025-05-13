@@ -19,13 +19,13 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/HarmonyQuest/Contest.Service/Contest.Service.sln
 
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build src/HarmonyQuest/Contest.Service/Contest.Service.sln --no-restore --configuration Release
 
   analyze:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
