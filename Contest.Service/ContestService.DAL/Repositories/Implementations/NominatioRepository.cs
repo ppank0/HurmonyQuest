@@ -7,9 +7,12 @@ public class NominationRepository(AppDbContext context) : RepositoryBase<Nominat
 {
     public bool IsMusicalInstrumentInNomination(Guid NominationId, Guid MusicalInstrumentId)
     {
-        return _context.Nominations
-        .Any(n => n.Id == NominationId && n.Instruments.Any(i => i.Id == MusicalInstrumentId));
+        var nomination = _context.Nominations
+            .FirstOrDefault(n => n.Id == NominationId);
 
+        return nomination != null &&
+               nomination.Instruments != null &&
+               nomination.Instruments.Any(i => i.Id == MusicalInstrumentId);
     }
 
 }
