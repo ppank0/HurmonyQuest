@@ -11,7 +11,8 @@ internal class TimestampInterceptor : SaveChangesInterceptor
         UpdateTimestamps(eventData);
         return base.SavingChanges(eventData, result);
     }
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
+                                            InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
         UpdateTimestamps(eventData);
         return base.SavingChangesAsync(eventData, result, cancellationToken);
