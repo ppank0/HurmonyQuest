@@ -19,7 +19,8 @@ public class JuryService(IRepositoryBase<Jury> repository, IMapper mapper) : IJu
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var jury = repository.FindByCondition(j => j.Id == id, ct).FirstOrDefault();
+        var juries = await repository.FindByConditionAsync(j => j.Id == id, ct);
+        var jury = juries.FirstOrDefault();
 
         if (jury is null)
         {

@@ -3,6 +3,6 @@
 public record StageEditDto
 (
     string Name,
-    DateTime StartDate,
-    DateTime EndDate
+    DateTime? StartDate,
+    DateTime? EndDate
 );

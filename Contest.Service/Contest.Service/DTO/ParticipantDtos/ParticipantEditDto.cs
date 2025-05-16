@@ -1,10 +1,12 @@
-﻿namespace ContestService.API.DTO.ParticipantDtos;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ContestService.API.DTO.ParticipantDtos;
 
 public record ParticipantEditDto
 (
     string Name,
     string Surname,
     DateOnly Birthday,
-    Guid MusicalInstrumentId,
-    Guid NominationId
+    Guid? MusicalInstrumentId,
+    Guid? NominationId
 );

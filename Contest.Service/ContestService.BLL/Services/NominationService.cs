@@ -18,7 +18,8 @@ public class NominationService(IRepositoryBase<Nomination> repository, IMapper m
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var nomination = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var nominations = await repository.FindByConditionAsync(p => p.Id == id, ct);
+        var nomination = nominations.FirstOrDefault();
 
         if (nomination is not null)
         {

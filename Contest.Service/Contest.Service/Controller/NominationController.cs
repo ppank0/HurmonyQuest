@@ -36,10 +36,10 @@ public class NominationController(INominationService nominationService, IMapper 
     }
 
     [HttpPut("{id}")]
-    public async Task<NominationDto> Update(Guid id, [FromBody] NominationDto nominationDto, CancellationToken ct)
+    public async Task<NominationDto> Update(Guid id, [FromBody] NominationEditDto nominationEditDto, CancellationToken ct)
     {
         var nominationModel = await nominationService.GetAsync(id, ct);
-        mapper.Map(nominationDto, nominationModel);
+        mapper.Map(nominationEditDto, nominationModel);
 
         var result = await nominationService.UpdateAsync(nominationModel, ct);
 

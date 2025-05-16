@@ -24,7 +24,9 @@ public class ParticipantService(IRepositoryBase<Participant> repository,
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var participant = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var participants = await repository.FindByConditionAsync(p => p.Id == id, ct);
+        var participant = participants.FirstOrDefault();
+
         if (participant is not null)
         {
             await repository.DeleteAsync(participant, ct);
