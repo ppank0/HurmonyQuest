@@ -13,5 +13,9 @@ public class ParticipantEditDtoValidator : AbstractValidator<ParticipantEditDto>
         RuleFor(model => model.Surname).CommonSurnameRules();
 
         RuleFor(model => model.Birthday).CommonBirthdayRules();
+
+        RuleFor(model => model.MusicalInstrumentId).NotEmpty();
+
+        RuleFor(model => model.NominationId).NotEmpty();
     }
 }

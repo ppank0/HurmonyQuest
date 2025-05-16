@@ -38,6 +38,8 @@ jobs:
         sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
         sonarProjectName: ${{ vars.SONARPROJECTNAME }}
         sonarOrganization: ${{ vars.SONARORGANIZATION }}
-        dotnetBuildArguments: ./Contest.Service/Contest.Service.sln --configuration Release
+        dotnetBuildArguments: ./Contest.Service --configuration Release
     env: 
+        EXCLUDE_FROM_COVERAGE: "**/Program.cs, **/Extensions/*, **/Exceptions/**, **/Context/*, **/Migrations/*, **/DI/*, **/Entities/*, **/Validators/*, **/Enums/**/*, **/Repositories/**, **/MappingConfigurations/*, **/ViewModels/**/*, **/Controllers/*, **/Utilities/**, **/EventBus/**"
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        EXCLUDE_FROM_SONAR: "**/Migrations/*, **/Dockerfile"
