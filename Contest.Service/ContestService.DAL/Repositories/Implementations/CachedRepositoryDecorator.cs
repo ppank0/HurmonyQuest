@@ -32,7 +32,7 @@ public class CachedRepositoryDecorator<T>(IRepositoryBase<T> inner, IDistributed
         }
         catch (Exception ex) 
         {
-            logger.LogError(ex, $"Redis is unavailable. Falling back to DB for type {typeof(T).Name}");
+            logger.LogError(ex, "Redis is unavailable. Falling back to DB for type {type}", typeof(T).Name);
 
             return await inner.GetAllToListAsync(ct);
         }

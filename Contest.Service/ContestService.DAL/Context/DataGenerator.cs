@@ -2,9 +2,9 @@
 using ContestService.DAL.Entities;
 
 namespace ContestService.DAL.Context;
-public class DataGenerator
+public static class DataGenerator
 {
-    public static DateTime timeAt = DateTime.SpecifyKind(new DateTime(2025, 5, 1, 12, 0, 0), DateTimeKind.Utc);
+    private static readonly DateTime timeAt = DateTime.SpecifyKind(new DateTime(2025, 5, 1, 12, 0, 0), DateTimeKind.Utc);
     public static Faker<Jury> GetJuryGenerator()
     {
         return new Faker<Jury>()

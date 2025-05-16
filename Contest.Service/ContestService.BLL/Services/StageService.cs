@@ -18,7 +18,8 @@ public class StageService(IRepositoryBase<Stage> repository, IMapper mapper) : I
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var stage = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var stages = await repository.FindByConditionAsync(p => p.Id == id, ct);
+        var stage = stages.FirstOrDefault();
 
         if (stage is  null)
         {

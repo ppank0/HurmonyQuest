@@ -32,7 +32,7 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         ProblemDetails details = new()
         {
             Status = (int)statusCode,
-            Title = ex.Message,
+            Title = message,
         };
 
         context.Response.ContentType = "application/json";

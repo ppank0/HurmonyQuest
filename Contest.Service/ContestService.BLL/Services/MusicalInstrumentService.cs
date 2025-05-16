@@ -18,7 +18,8 @@ public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> reposit
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var musicalInstrument = repository.FindByCondition(p => p.Id == id, ct).FirstOrDefault();
+        var musicalInstruments = await repository.FindByConditionAsync(p => p.Id == id, ct);
+        var musicalInstrument = musicalInstruments.FirstOrDefault();
 
         if (musicalInstrument is not null)
         {
@@ -61,7 +62,7 @@ public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> reposit
         }
 
         mapper.Map(model, entityToUpdate);
-        MusicalInstrument updated = await repository.UpdateAsync(entityToUpdate, ct);
+        await repository.UpdateAsync(entityToUpdate, ct);
 
         return mapper.Map<MusicalInstrumentModel>(entityToUpdate);
     }

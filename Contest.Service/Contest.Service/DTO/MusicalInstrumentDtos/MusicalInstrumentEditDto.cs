@@ -2,7 +2,6 @@
 
 public record MusicalInstrumentEditDto
 (
-    Guid Id,
-    string Name,
-    Guid NominationId
+    string? Name,
+    Guid? NominationId
 );

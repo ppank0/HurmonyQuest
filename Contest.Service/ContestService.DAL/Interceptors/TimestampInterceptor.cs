@@ -11,15 +11,16 @@ internal class TimestampInterceptor : SaveChangesInterceptor
         UpdateTimestamps(eventData);
         return base.SavingChanges(eventData, result);
     }
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken ct)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken)
     {
         UpdateTimestamps(eventData);
-        return base.SavingChangesAsync(eventData, result, ct);
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    public void UpdateTimestamps(DbContextEventData eventData)
+    public static void UpdateTimestamps(DbContextEventData eventData)
     {
-        var context = eventData.Context;
+        if (eventData?.Context == null) return;
+
         var utcNow = DateTime.UtcNow;
 
         foreach (var entry in eventData.Context.ChangeTracker.Entries<IHasTimestamps>())
