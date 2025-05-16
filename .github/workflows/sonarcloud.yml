@@ -38,7 +38,7 @@ jobs:
         sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
         sonarProjectName: ${{ vars.SONARPROJECTNAME }}
         sonarOrganization: ${{ vars.SONARORGANIZATION }}
-        dotnetBuildArguments: ./Contest.Service.sln --configuration Release
+        dotnetBuildArguments: --configuration Release
         sonarBeginArguments: /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx" /d:sonar.coverage.exclusions="${{env.EXCLUDE_FROM_COVERAGE}}" /d:sonar.exclusions="${{env.EXCLUDE_FROM_SONAR}}"
 
     env: 
