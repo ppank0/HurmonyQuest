@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
+using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
@@ -13,14 +14,19 @@ namespace ContestService.BLL.Tests.ServiceTests
     public class JuryServiceTests
     {
         private readonly Mock<IRepositoryBase<Jury>> _repositoryMock;
-        private readonly Mock<IMapper> _mapperMock;
+        private readonly IMapper _mapper;
         private readonly JuryService _juryService;
 
         public JuryServiceTests()
         {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<MappingProfile>(); // та же конфигурация, что в BLL
+            });
+            _mapper = config.CreateMapper();
+
             _repositoryMock = new Mock<IRepositoryBase<Jury>>();
-            _mapperMock = new Mock<IMapper>();
-            _juryService = new JuryService(_repositoryMock.Object, _mapperMock.Object);
+            _juryService = new JuryService(_repositoryMock.Object, _mapper);
         }
 
         [Fact]
@@ -36,20 +42,9 @@ namespace ContestService.BLL.Tests.ServiceTests
                 UserId = Guid.NewGuid(),
             };
 
-            var juryEntity = new Jury
-            {
-                Id = juryModel.Id,
-                Name = juryModel.Name,
-                Surname = juryModel.Surname,
-                Birthday = juryModel.Birthday,
-                UserId = juryModel.UserId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+            var juryEntity = _mapper.Map<Jury>(juryModel);
 
-            _mapperMock.Setup(m => m.Map<Jury>(juryModel)).Returns(juryEntity);
-            _repositoryMock.Setup(r => r.CreateAsync(juryEntity, It.IsAny<CancellationToken>())).ReturnsAsync(juryEntity);
-            _mapperMock.Setup(m => m.Map<JuryModel>(juryEntity)).Returns(juryModel);
+            _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Jury>(), It.IsAny<CancellationToken>())).ReturnsAsync(juryEntity);
             var cancellationToken = CancellationToken.None;
 
             //Act
@@ -59,9 +54,7 @@ namespace ContestService.BLL.Tests.ServiceTests
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(juryModel);
 
-            _mapperMock.Verify(m => m.Map<Jury>(juryModel), Times.Once);
-            _repositoryMock.Verify(r => r.CreateAsync(juryEntity, cancellationToken), Times.Once);
-            _mapperMock.Verify(m => m.Map<JuryModel>(juryEntity), Times.Once);
+            _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<Jury>(), cancellationToken), Times.Once);
         }
 
         [Fact]
@@ -124,14 +117,9 @@ namespace ContestService.BLL.Tests.ServiceTests
                     CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow},
             };
 
-            var juriesModels = new List<JuryModel>
-            {
-                new JuryModel{Id = juriesEntity[0].Id, Name = juriesEntity[0].Name, Surname = juriesEntity[0].Surname, Birthday = juriesEntity[0].Birthday, UserId = juriesEntity[0].UserId},
-                new JuryModel{Id = juriesEntity[1].Id, Name = juriesEntity[1].Name, Surname = juriesEntity[1].Surname, Birthday = juriesEntity[1].Birthday, UserId = juriesEntity[1].UserId},
-            };
+            var juriesModels = _mapper.Map<List<JuryModel>>(juriesEntity);
 
             _repositoryMock.Setup(r => r.GetAllToListAsync(cancellationToken)).ReturnsAsync(juriesEntity);
-            _mapperMock.Setup(m => m.Map<List<JuryModel>>(juriesEntity)).Returns(juriesModels);
 
             //Act 
             var result = await _juryService.GetAllAsync(cancellationToken);
@@ -141,7 +129,6 @@ namespace ContestService.BLL.Tests.ServiceTests
             result.Should().BeEquivalentTo(juriesModels);
 
             _repositoryMock.Verify(r => r.GetAllToListAsync(cancellationToken), Times.Once);
-            _mapperMock.Verify(m => m.Map<List<JuryModel>>(juriesEntity), Times.Once);
         }
 
         [Fact]
@@ -151,26 +138,21 @@ namespace ContestService.BLL.Tests.ServiceTests
             var cancellationToken = CancellationToken.None;
             var juryId = Guid.NewGuid();
 
-
-            var juryEntites = new List<Jury>
-            {
-                new Jury { Id = juryId, Name = "Test", Surname = "Test", Birthday = new DateOnly(1986, 12, 12), UserId = Guid.NewGuid(),
-                        CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow}
-            };
-
-            var juryModel = new JuryModel
+            var juryEntity = new Jury
             {
                 Id = juryId,
-                Name = juryEntites[0].Name,
-                Surname = juryEntites[0].Surname,
-                Birthday = juryEntites[0].Birthday,
-                UserId = juryEntites[0].UserId
+                Name = "Test",
+                Surname = "Test",
+                Birthday = new DateOnly(1986, 12, 12),
+                UserId = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
-            _mapperMock.Setup(m => m.Map<JuryModel>(juryEntites[0])).Returns(juryModel);
+            var juryModel = _mapper.Map<JuryModel>(juryEntity);
 
             _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken))
-                .ReturnsAsync(juryEntites);
+                .ReturnsAsync(new List<Jury> { juryEntity});
 
             //Act
             var result = await _juryService.GetAsync(juryId, cancellationToken);
@@ -179,7 +161,6 @@ namespace ContestService.BLL.Tests.ServiceTests
             result.Should().BeEquivalentTo(juryModel);
 
             _repositoryMock.Verify(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken), Times.Once);
-            _mapperMock.Verify(m => m.Map<JuryModel>(juryEntites[0]), Times.Once);
         }
 
         [Fact]
@@ -227,19 +208,10 @@ namespace ContestService.BLL.Tests.ServiceTests
                 UpdatedAt = DateTime.UtcNow
             };
 
-            var model = new JuryModel
-            {
-                Id = juryId,
-                Name = "New",
-                Surname = "Name",
-                Birthday = updatedEntity.Birthday,
-                UserId = updatedEntity.UserId
-            };
+            var model = _mapper.Map<JuryModel>(updatedEntity);
 
             _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken)).ReturnsAsync(new List<Jury> { existingEntity });
-            _mapperMock.Setup(m => m.Map(model, existingEntity));
             _repositoryMock.Setup(r => r.UpdateAsync(existingEntity, cancellationToken)).ReturnsAsync(updatedEntity);
-            _mapperMock.Setup(m => m.Map<JuryModel>(updatedEntity)).Returns(model);
 
             //Act 
             var result = await _juryService.UpdateAsync(model, cancellationToken);
@@ -248,9 +220,7 @@ namespace ContestService.BLL.Tests.ServiceTests
             result.Should().BeEquivalentTo(model);
 
             _repositoryMock.Verify(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken), Times.Once);
-            _mapperMock.Verify(m => m.Map(model, existingEntity), Times.Once);
             _repositoryMock.Verify(r => r.UpdateAsync(existingEntity, cancellationToken), Times.Once);
-            _mapperMock.Verify(m => m.Map<JuryModel>(updatedEntity), Times.Once);
         }
 
         [Fact]

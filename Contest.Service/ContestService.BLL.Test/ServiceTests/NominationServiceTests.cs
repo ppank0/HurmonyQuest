@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
+using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
@@ -12,14 +13,19 @@ namespace ContestService.BLL.Tests.ServiceTests;
 public class NominationServiceTests
 {
     private readonly NominationService _nominationService;
-    private readonly Mock<IMapper> _mapperMock;
+    private readonly IMapper _mapper;
     private readonly Mock<IRepositoryBase<Nomination>> _repositoryMock;
 
     public NominationServiceTests()
     {
-        _mapperMock = new Mock<IMapper>();
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>(); // та же конфигурация, что в BLL
+        });
+        _mapper = config.CreateMapper();
+
         _repositoryMock = new Mock<IRepositoryBase<Nomination>>();
-        _nominationService = new NominationService(_repositoryMock.Object, _mapperMock.Object);
+        _nominationService = new NominationService(_repositoryMock.Object, _mapper);
     }
 
     [Fact]
@@ -33,17 +39,9 @@ public class NominationServiceTests
             Name = "Test"
         };
 
-        var entity = new Nomination
-        {
-            Id = model.Id,
-            Name = model.Name,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+        var entity = _mapper.Map<Nomination>(model);
 
-        _mapperMock.Setup(m => m.Map<Nomination>(model)).Returns(entity);
-        _repositoryMock.Setup(r => r.CreateAsync(entity, cancellationToken)).ReturnsAsync(entity);
-        _mapperMock.Setup(m => m.Map<NominationModel>(entity)).Returns(model);
+        _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Nomination>(), cancellationToken)).ReturnsAsync(entity);
 
         //Act
         var result = await _nominationService.CreateAsync(model, cancellationToken);
@@ -51,7 +49,7 @@ public class NominationServiceTests
         //Assert
         result.Should().BeEquivalentTo(model);
 
-        _repositoryMock.Verify(r => r.CreateAsync(entity, cancellationToken), Times.Once);
+        _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<Nomination>(), cancellationToken), Times.Once);
     }
 
     [Fact]
@@ -99,15 +97,14 @@ public class NominationServiceTests
         // Arrange
         var ct = CancellationToken.None;
         var entities = new List<Nomination>
-    {
-        new() { Id = Guid.NewGuid(), Name = "Solo", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-        new() { Id = Guid.NewGuid(), Name = "Duet", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
-    };
+        {
+            new() { Id = Guid.NewGuid(), Name = "Solo", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), Name = "Duet", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        };
 
-        var models = entities.Select(e => new NominationModel { Id = e.Id, Name = e.Name }).ToList();
+        var models = _mapper.Map<List<NominationModel>>(entities);
 
         _repositoryMock.Setup(r => r.GetAllToListAsync(ct)).ReturnsAsync(entities);
-        _mapperMock.Setup(m => m.Map<List<NominationModel>>(entities)).Returns(models);
 
         // Act
         var result = await _nominationService.GetAllAsync(ct);
@@ -156,16 +153,14 @@ public class NominationServiceTests
         var id = Guid.NewGuid();
         var model = new NominationModel { Id = id, Name = "Updated Name" };
         var entity = new Nomination { Id = id, Name = "Old Name", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+        var updatedEntity = _mapper.Map<Nomination>(model);
 
         _repositoryMock.Setup(r =>
             r.FindByConditionAsync(It.IsAny<Expression<Func<Nomination, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Nomination> { entity });
 
-        _mapperMock.Setup(m => m.Map(model, entity));
         _repositoryMock.Setup(r => r.UpdateAsync(entity, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(entity);
-
-        _mapperMock.Setup(m => m.Map<NominationModel>(entity)).Returns(model);
+            .ReturnsAsync(updatedEntity);
 
         // Act
         var result = await _nominationService.UpdateAsync(model, CancellationToken.None);

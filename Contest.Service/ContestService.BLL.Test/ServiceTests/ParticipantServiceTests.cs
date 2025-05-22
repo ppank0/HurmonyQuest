@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
+using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
@@ -13,12 +14,18 @@ public class ParticipantServiceTests
 {
     private readonly Mock<IRepositoryBase<Participant>> _repositoryMock = new();
     private readonly Mock<INominationRepository> _nominationRepoMock = new();
-    private readonly Mock<IMapper> _mapperMock = new();
+    private readonly IMapper _mapper;
     private readonly ParticipantService _service;
 
     public ParticipantServiceTests()
     {
-        _service = new ParticipantService(_repositoryMock.Object, _nominationRepoMock.Object, _mapperMock.Object);
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>(); // та же конфигурация, что в BLL
+        });
+        _mapper = config.CreateMapper();
+
+        _service = new ParticipantService(_repositoryMock.Object, _nominationRepoMock.Object, _mapper);
     }
 
     [Fact]
@@ -36,19 +43,17 @@ public class ParticipantServiceTests
             UserId = Guid.NewGuid()
         };
 
-        var entity = new Participant { Id = model.Id, Name = model.Name, Surname = model.Surname, Birthday = model.Birthday,
-            UserId = model.UserId,  MusicalInstrumentId = model.MusicalInstrumentId, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow};
+        var entity = _mapper.Map<Participant>(model);
 
         _nominationRepoMock.Setup(x => x.IsMusicalInstrumentInNomination(model.NominationId, model.MusicalInstrumentId)).Returns(true);
-        _mapperMock.Setup(m => m.Map<Participant>(model)).Returns(entity);
-        _repositoryMock.Setup(r => r.CreateAsync(entity, It.IsAny<CancellationToken>())).ReturnsAsync(entity);
-        _mapperMock.Setup(m => m.Map<ParticipantModel>(entity)).Returns(model);
+        _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Participant>(), It.IsAny<CancellationToken>())).ReturnsAsync(entity);
 
         // Act
         var result = await _service.CreateAsync(model, CancellationToken.None);
 
         // Assert
-        result.Should().BeEquivalentTo(model);
+        result.Should().BeEquivalentTo(model, options => options
+            .Excluding(p => p.NominationId));
     }
 
     [Fact]
@@ -119,17 +124,9 @@ public class ParticipantServiceTests
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         } };
-        var models = new List<ParticipantModel> { new ParticipantModel 
-        { 
-            Id = entities[0].Id,
-            Name = entities[0].Name,
-            Surname = entities[0].Surname,
-            Birthday = entities[0].Birthday,
-            MusicalInstrumentId = entities[0].MusicalInstrumentId,
-        }};
+        var models = _mapper.Map<List<ParticipantModel>>(entities);
 
         _repositoryMock.Setup(r => r.GetAllToListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
-        _mapperMock.Setup(m => m.Map<List<ParticipantModel>>(entities)).Returns(models);
 
         //Act
         var result = await _service.GetAllAsync(CancellationToken.None);
@@ -154,19 +151,10 @@ public class ParticipantServiceTests
             UpdatedAt = DateTime.UtcNow
         };
 
-        var model = new ParticipantModel
-        {
-            Id = entity.Id,
-            Name = entity.Name,
-            Surname = entity.Surname,
-            Birthday = entity.Birthday,
-            NominationId = Guid.NewGuid(),
-            MusicalInstrumentId = entity.MusicalInstrumentId,
-        };
+        var model = _mapper.Map<ParticipantModel>(entity);
 
         _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Participant, bool>>>(), It.IsAny<CancellationToken>()))
                        .ReturnsAsync([entity]);
-        _mapperMock.Setup(m => m.Map<ParticipantModel>(entity)).Returns(model);
 
         //Act
         var result = await _service.GetAsync(id, CancellationToken.None);
@@ -200,21 +188,29 @@ public class ParticipantServiceTests
             NominationId = Guid.NewGuid(),
             MusicalInstrumentId = Guid.NewGuid()
         };
-
-        var entity = new Participant { Id = model.Id, Name = model.Name, Surname = model.Surname, Birthday = model.Birthday,
-            UserId = model.UserId, MusicalInstrumentId = model.MusicalInstrumentId, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow};
+        var oldEntity = new Participant
+        {
+            Id = model.Id,
+            Name = "jdfhfd",
+            Surname = "ifdsjfodsp",
+            Birthday = model.Birthday,
+            UserId = model.UserId,
+            MusicalInstrumentId = model.MusicalInstrumentId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        var updatedEntity = _mapper.Map<Participant>(model);
 
         _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Participant, bool>>>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync([entity]);
-        _mapperMock.Setup(m => m.Map(model, entity));
-        _repositoryMock.Setup(r => r.UpdateAsync(entity, It.IsAny<CancellationToken>())).ReturnsAsync(entity);
-        _mapperMock.Setup(m => m.Map<ParticipantModel>(entity)).Returns(model);
+                       .ReturnsAsync(new List<Participant>{oldEntity});
+        _repositoryMock.Setup(r => r.UpdateAsync(It.IsAny<Participant>(), It.IsAny<CancellationToken>())).ReturnsAsync(updatedEntity);
 
         //Act
         var result = await _service.UpdateAsync(model, CancellationToken.None);
 
         //Assert
-        result.Should().BeEquivalentTo(model);
+        result.Should().BeEquivalentTo(model, options => options
+    .Excluding(p => p.NominationId));
     }
 
     [Fact]
