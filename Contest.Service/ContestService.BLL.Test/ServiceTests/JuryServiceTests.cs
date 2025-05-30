@@ -3,6 +3,7 @@ using ContestService.BLL.Exceptions;
 using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
 using ContestService.BLL.Services;
+using ContestService.BLL.Tests.Customizations;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 using FluentAssertions;
@@ -29,51 +30,33 @@ namespace ContestService.BLL.Tests.ServiceTests
             _juryService = new JuryService(_repositoryMock.Object, _mapper);
         }
 
-        [Fact]
-        public async Task CreateAsync_ShouldCreateJurySuccessfully()
+        [Theory]
+        [CustomAutoData]
+        public async Task CreateAsync_ShouldCreateJurySuccessfully(JuryModel juryModel)
         {
-            //Arrange
-            var juryModel = new JuryModel
-            {
-                Id = Guid.NewGuid(),
-                Name = "Test",
-                Surname = "Test",
-                Birthday = new DateOnly(1986, 12, 5),
-                UserId = Guid.NewGuid(),
-            };
-
+            // Arrange
             var juryEntity = _mapper.Map<Jury>(juryModel);
+            _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Jury>(), It.IsAny<CancellationToken>()))
+                           .ReturnsAsync(juryEntity);
 
-            _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Jury>(), It.IsAny<CancellationToken>())).ReturnsAsync(juryEntity);
             var cancellationToken = CancellationToken.None;
 
-            //Act
+            // Act
             var result = await _juryService.CreateAsync(juryModel, cancellationToken);
 
-            //Assert
+            // Assert
             result.Should().NotBeNull();
             result.Should().BeEquivalentTo(juryModel);
-
             _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<Jury>(), cancellationToken), Times.Once);
         }
 
-        [Fact]
-        public async Task DeleteAsync_ShouldDeleteJury_WhenJuryExists()
+        [Theory]
+        [CustomAutoData]
+        public async Task DeleteAsync_ShouldDeleteJury_WhenJuryExists(Jury jury)
         {
             //Arrange
             var juryId = Guid.NewGuid();
             var cancellationToken = CancellationToken.None;
-
-            var jury = new Jury
-            {
-                Id = juryId,
-                Name = "Test",
-                Surname = "Test",
-                Birthday = new DateOnly(1986, 12, 12),
-                UserId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
 
             _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken))
                                                                                         .ReturnsAsync(new List<Jury> { jury });
@@ -104,17 +87,15 @@ namespace ContestService.BLL.Tests.ServiceTests
             _repositoryMock.Verify(r => r.DeleteAsync(It.IsAny<Jury>(), cancellationToken), Times.Never);
         }
 
-        [Fact]
-        public async Task GetAllAsync_ReturnsListSuccessfully()
+        [Theory]
+        [CustomAutoData]
+        public async Task GetAllAsync_ReturnsListSuccessfully(Jury jury)
         {
             //Arrange
             var cancellationToken = CancellationToken.None;
             var juriesEntity = new List<Jury>
             {
-                new Jury{Id = Guid.NewGuid(), Name = "Test", Surname = "Test", Birthday = new DateOnly(1986, 12, 12), UserId = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow},
-                new Jury{Id = Guid.NewGuid(), Name = "Test2", Surname = "Test2", Birthday = new DateOnly(1986, 6, 2), UserId = Guid.NewGuid(),
-                    CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow},
+                jury, jury
             };
 
             var juriesModels = _mapper.Map<List<JuryModel>>(juriesEntity);
@@ -131,28 +112,19 @@ namespace ContestService.BLL.Tests.ServiceTests
             _repositoryMock.Verify(r => r.GetAllToListAsync(cancellationToken), Times.Once);
         }
 
-        [Fact]
-        public async Task GetAsync_ReturnsJury_WhenJuryExist()
+        [Theory]
+        [CustomAutoData]
+        public async Task GetAsync_ReturnsJury_WhenJuryExist(Jury jury)
         {
             //Arrange
             var cancellationToken = CancellationToken.None;
             var juryId = Guid.NewGuid();
-
-            var juryEntity = new Jury
-            {
-                Id = juryId,
-                Name = "Test",
-                Surname = "Test",
-                Birthday = new DateOnly(1986, 12, 12),
-                UserId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            var juryModel = _mapper.Map<JuryModel>(juryEntity);
+            jury.Id = juryId;
+            
+            var juryModel = _mapper.Map<JuryModel>(jury);
 
             _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken))
-                .ReturnsAsync(new List<Jury> { juryEntity});
+                .ReturnsAsync(new List<Jury> { jury});
 
             //Act
             var result = await _juryService.GetAsync(juryId, cancellationToken);
@@ -180,43 +152,38 @@ namespace ContestService.BLL.Tests.ServiceTests
             _repositoryMock.Verify(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken), Times.Once);
         }
 
-        [Fact]
-        public async Task UpdateAsync_UpdateSuccessfully()
+        [Theory]
+        [CustomAutoData]
+        public async Task UpdateAsync_UpdateSuccessfully(JuryModel model)
         {
-            //Arrange
+            // Arrange
             var cancellationToken = CancellationToken.None;
-            var juryId = Guid.NewGuid();
+
+            var updatedEntity = _mapper.Map<Jury>(model);
+
             var existingEntity = new Jury
             {
-                Id = juryId,
+                Id = updatedEntity.Id,
                 Name = "Old",
-                Surname = "Name",
-                Birthday = new DateOnly(1986, 12, 12),
-                UserId = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                Surname = updatedEntity.Surname,
+                Birthday = updatedEntity.Birthday,
+                UserId = updatedEntity.UserId,
+                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                UpdatedAt = DateTime.UtcNow.AddDays(-5),
             };
 
-            var updatedEntity = new Jury
-            {
-                Id = juryId,
-                Name = "New",
-                Surname = "Name",
-                Birthday = new DateOnly(1986, 12, 12),
-                UserId = existingEntity.UserId,
-                CreatedAt = existingEntity.CreatedAt,
-                UpdatedAt = DateTime.UtcNow
-            };
+            _repositoryMock
+                .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken))
+                .ReturnsAsync(new List<Jury> { existingEntity });
 
-            var model = _mapper.Map<JuryModel>(updatedEntity);
+            _repositoryMock
+                .Setup(r => r.UpdateAsync(existingEntity, cancellationToken))
+                .ReturnsAsync(updatedEntity);
 
-            _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken)).ReturnsAsync(new List<Jury> { existingEntity });
-            _repositoryMock.Setup(r => r.UpdateAsync(existingEntity, cancellationToken)).ReturnsAsync(updatedEntity);
-
-            //Act 
+            // Act
             var result = await _juryService.UpdateAsync(model, cancellationToken);
 
-            //Assert
+            // Assert
             result.Should().BeEquivalentTo(model);
 
             _repositoryMock.Verify(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Jury, bool>>>(), cancellationToken), Times.Once);
