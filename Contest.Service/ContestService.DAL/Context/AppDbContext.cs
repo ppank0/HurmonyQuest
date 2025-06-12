@@ -3,11 +3,14 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 
 namespace ContestService.DAL.Context;
 
-public class AppDbContext(DbContextOptions options) : DbContext(options)
+public class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions options) : base(options) => Database.Migrate();
+    
     public DbSet<Stage> Stages { get; set; }
     public DbSet<Nomination> Nominations { get; set; }
     public DbSet<MusicalInstrument> MusicalInstruments { get; set; }
