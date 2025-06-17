@@ -2,15 +2,18 @@
 using ContestService.API.DTO.MusicalInstrumentDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
 
 [Route("api/instruments")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy ="CanReadOnly")]
     public async Task<List<MusicalInstrumentDto>> GetAll(CancellationToken ct)
     {
         var instruments = await instrumentService.GetAllAsync(ct);

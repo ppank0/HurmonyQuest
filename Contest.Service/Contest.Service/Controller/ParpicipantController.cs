@@ -2,15 +2,18 @@
 using ContestService.API.DTO.ParticipantDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
 
 [Route("api/participants")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class ParpicipantController(IParticipantService participantService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = "CanReadOnly")]
     public async Task<List<ParticipantDto>> GetAll(CancellationToken ct)
     {
         var result = await participantService.GetAllAsync(ct);
@@ -36,6 +39,7 @@ public class ParpicipantController(IParticipantService participantService, IMapp
     }
 
     [HttpPut("{id}")]
+    [Authorize("edit:participant-edit-own")]
     public async Task<ParticipantDto> Update(Guid id, [FromBody] ParticipantEditDto participantDto, CancellationToken ct)
     {
         var participantModel = await participantService.GetAsync(id, ct);

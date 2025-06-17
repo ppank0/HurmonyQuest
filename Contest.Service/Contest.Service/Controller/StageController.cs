@@ -2,15 +2,18 @@
 using ContestService.API.DTO.StageDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
 
 [Route("api/stages")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class StageController(IStageService stageService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Policy = "CanReadOnly")]
     public async Task<List<StageDto>> GetAll(CancellationToken ct)
     {
         var result = await stageService.GetAllAsync(ct);
