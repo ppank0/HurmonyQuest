@@ -9,11 +9,10 @@ namespace ContestService.API.Controller;
 
 [Route("api/stages")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class StageController(IStageService stageService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Policy = "CanReadOnly")]
     public async Task<List<StageDto>> GetAll(CancellationToken ct)
     {
         var result = await stageService.GetAllAsync(ct);

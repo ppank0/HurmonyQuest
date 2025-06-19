@@ -9,11 +9,10 @@ namespace ContestService.API.Controller;
 
 [Route("api/juries")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class JuryController(IMapper mapper, IJuryService juryService) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Policy = "CanReadOnly")]
     public async Task<List<JuryDto>> GetAll(CancellationToken ct)
     {
         var juries = await juryService.GetAllAsync(ct);

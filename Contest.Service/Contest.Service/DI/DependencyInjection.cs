@@ -1,4 +1,5 @@
 ﻿using ContestService.API.Authorization;
+using ContestService.API.Extensions;
 using ContestService.API.Mapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -14,9 +15,10 @@ public static class DependencyInjection
     {
         services.AddAutoMapper(typeof(MappingProfile));
         services.AddAutoValidation();
-        services.addAuth0Authentication(configuration);
+        services.AddAuth0Authentication(configuration);
 
         services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+        services.AddSwaggerDocumentation();
     }
     public static void AddAutoValidation(this IServiceCollection services)
     {
@@ -24,7 +26,7 @@ public static class DependencyInjection
         services.AddFluentValidationAutoValidation();
     }
 
-    private static void addAuth0Authentication(this IServiceCollection services, IConfiguration configuration)
+    public static void AddAuth0Authentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(options =>
         {
@@ -34,17 +36,6 @@ public static class DependencyInjection
         {
             options.Authority = $"https://{configuration["Auth0:Domain"]}/"; 
             options.Audience = configuration["Auth0:Audience"];
-        });
-
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("CanReadOnly", policy =>
-            {
-                policy.RequireAssertion(context =>
-                    (context.User.IsInRole("Participant") && context.User.HasClaim("scope", "read:read-only")) ||
-                    (context.User.IsInRole("Jury") && context.User.HasClaim("scope", "read:read-only"))
-                );
-            });
         });
     }
 }

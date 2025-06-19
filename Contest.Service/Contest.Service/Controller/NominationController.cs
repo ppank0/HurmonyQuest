@@ -9,11 +9,10 @@ namespace ContestService.API.Controller;
 
 [Route("api/nominations")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class NominationController(INominationService nominationService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Policy = "CanReadOnly")]
     public async Task<List<NominationDto>> GetAll(CancellationToken ct)
     {
         var result = await nominationService.GetAllAsync(ct);

@@ -9,11 +9,10 @@ namespace ContestService.API.Controller;
 
 [Route("api/instruments")]
 [ApiController]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Policy ="CanReadOnly")]
     public async Task<List<MusicalInstrumentDto>> GetAll(CancellationToken ct)
     {
         var instruments = await instrumentService.GetAllAsync(ct);
