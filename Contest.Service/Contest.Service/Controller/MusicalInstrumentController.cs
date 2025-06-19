@@ -2,12 +2,14 @@
 using ContestService.API.DTO.MusicalInstrumentDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
 
 [Route("api/instruments")]
 [ApiController]
+[Authorize]
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]

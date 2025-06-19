@@ -2,12 +2,14 @@
 using ContestService.API.DTO.JuryDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
 
 [Route("api/juries")]
 [ApiController]
+[Authorize]
 public class JuryController(IMapper mapper, IJuryService juryService) : ControllerBase
 {
     [HttpGet]
@@ -36,6 +38,7 @@ public class JuryController(IMapper mapper, IJuryService juryService) : Controll
     }
 
     [HttpPut("{id}")]
+    [Authorize("edit:jury-edit-own")]
     public async Task<JuryEditDto> Update(Guid id, [FromBody] JuryEditDto juryDto, CancellationToken ct)
     {
         var juryModel = await juryService.GetAsync(id, ct);
