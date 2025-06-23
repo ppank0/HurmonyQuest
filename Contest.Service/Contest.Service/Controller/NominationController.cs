@@ -2,12 +2,14 @@
 using ContestService.API.DTO.NominationDtos;
 using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContestService.API.Controller;
 
 [Route("api/nominations")]
 [ApiController]
+[Authorize]
 public class NominationController(INominationService nominationService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
