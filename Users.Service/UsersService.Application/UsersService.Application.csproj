@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UserService.DataAccess\UserService.Domain.csproj" />
+    <ProjectReference Include="..\UserService.DataAccess\UsersService.Domain.csproj" />
   </ItemGroup>
 
 </Project>

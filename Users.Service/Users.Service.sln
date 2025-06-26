@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersService.API", "Users.Service\UsersService.API.csproj", "{DFFEB9DA-AD57-4DB4-A833-1EBA0D7AA1C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Domain", "UserService.DataAccess\UserService.Domain.csproj", "{D7C46776-FC98-4D23-A8C6-C236B819165D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersService.Domain", "UserService.DataAccess\UsersService.Domain.csproj", "{D7C46776-FC98-4D23-A8C6-C236B819165D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersService.Application", "UsersService.Application\UsersService.Application.csproj", "{DAE501E2-9F2B-4640-93E1-5F8B060F4D88}"
 EndProject
