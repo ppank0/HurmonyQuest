@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UserService.DataAccess\UsersService.Domain.csproj" />
+    <ProjectReference Include="..\UsersService.Domain\UsersService.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CQRS\Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
 
 </Project>

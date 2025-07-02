@@ -14,8 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UserService.DataAccess\UsersService.Domain.csproj" />
-    <ProjectReference Include="..\UsersService.Application\UsersService.Application.csproj" />
     <ProjectReference Include="..\UsersService.Infrastructure\UsersService.Infrastructure.csproj" />
   </ItemGroup>
 
