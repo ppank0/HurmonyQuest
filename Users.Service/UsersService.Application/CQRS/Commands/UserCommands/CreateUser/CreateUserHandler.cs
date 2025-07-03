@@ -3,10 +3,11 @@ using UsersService.Domain.Entities;
 using UsersService.Domain.Interfaces;
 using UsersService.Application.DTOs;
 using UsersService.Domain.Exceptions;
+using AutoMapper;
 
 namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
 {
-    public class CreateUserHandler(IUserRepository repository) : IRequestHandler<CreateUserCommand, UserDto>
+    public class CreateUserHandler(IUserRepository repository, IMapper mapper) : IRequestHandler<CreateUserCommand, UserDto>
     {
 
         public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -18,22 +19,11 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
                 throw new BadRequestException("User already exists");
             }
 
-            var user = new UserEntity
-            {
-                Email = request.UserDto.Email,
-                UserPictureUrl = request.UserDto.UserPictureUrl,
-                AuthId = request.UserDto.AuthId,
-            }; 
+            var user = mapper.Map<UserEntity>(request.UserDto);
 
             await repository.AddAsync(user);
 
-            return new UserDto
-            (
-                user.Id,
-                user.Email,
-                user.UserPictureUrl,
-                user.AuthId
-            );
+            return mapper.Map<UserDto>(user);
         }
     }
 }
