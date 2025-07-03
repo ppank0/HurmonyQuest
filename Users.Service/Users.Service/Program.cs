@@ -1,4 +1,6 @@
 
+using UsersService.API.Extensions;
+
 namespace Users.Service
 {
     public class Program
@@ -6,6 +8,9 @@ namespace Users.Service
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var services = builder.Services;
+            services.CongigureSqlContext(builder.Configuration);
 
             // Add services to the container.
 
