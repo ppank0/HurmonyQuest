@@ -4,6 +4,7 @@ using UsersService.Domain.Interfaces;
 using UsersService.Application.DTOs;
 using UsersService.Domain.Exceptions;
 using AutoMapper;
+using System.Net;
 
 namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
 {
@@ -16,7 +17,7 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
 
             if(existing is not null)
             {
-                throw new BadRequestException("User already exists");
+                throw new ConflictException("User already exists");
             }
 
             var user = mapper.Map<UserEntity>(request.UserDto);

@@ -8,7 +8,5 @@ using UsersService.Application.DTOs;
 
 namespace UsersService.Application.CQRS.Queries.GetUsers
 {
-    public record GetUsersQuery() : IRequest<IEnumerable<UserDto>>
-    {
-    }
+    public record GetUsersQuery() : IRequest<IEnumerable<UserDto>>;
 }
