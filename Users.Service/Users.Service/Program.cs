@@ -10,14 +10,16 @@ namespace Users.Service
             var builder = WebApplication.CreateBuilder(args);
 
             var services = builder.Services;
-            services.CongigureSqlContext(builder.Configuration);
+
+            services.AddServicesConfiguration(builder.Configuration);
 
             // Add services to the container.
+            services.AddControllers();
 
-            builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+            services.AddSwaggerDocumentation();
 
             var app = builder.Build();
 

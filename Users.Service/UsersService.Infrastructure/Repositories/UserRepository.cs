@@ -39,7 +39,7 @@ namespace UsersService.Infrastructure.Repositories
                 throw new ArgumentNullException(nameof(AuthId));
             }
 
-            var result = await context.Users.FirstOrDefaultAsync(x => x.AuthId == AuthId);
+            var result = await context.Users.FirstAsync(x => x.AuthId == AuthId);
 
             if (result is null)
             {
