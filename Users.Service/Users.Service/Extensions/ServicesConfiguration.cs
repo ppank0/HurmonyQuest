@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using UsersService.Infrastructure.Context;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using UsersService.Application;
+using UsersService.Application.MapperProfile;
 using UsersService.Infrastructure.DI;
 
 namespace UsersService.API.Extensions
@@ -11,6 +12,8 @@ namespace UsersService.API.Extensions
         {
             services.AddInfrastructure(configuration);
             services.AddAuth0Authentication(configuration);
+            services.ConfigureMediatR();
+            services.AddAutoMapper(typeof(UserProfile));
         }
         private static void AddAuth0Authentication(this IServiceCollection services, IConfiguration configuration)
         {
@@ -24,5 +27,9 @@ namespace UsersService.API.Extensions
                 options.Audience = configuration["Auth0:Audience"];
             });
         }
+
+        private static void ConfigureMediatR(this IServiceCollection services) =>
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationMarker).Assembly));
+
     }
 }

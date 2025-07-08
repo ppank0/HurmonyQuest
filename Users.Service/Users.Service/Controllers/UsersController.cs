@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UsersService.Application.CQRS.Commands.UserCommands.CreateUser;
 using UsersService.Application.CQRS.Commands.UserCommands.DeleteUser;
@@ -10,6 +11,7 @@ using UsersService.Application.DTOs;
 
 namespace UsersService.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController(IMediator mediator) : ControllerBase
