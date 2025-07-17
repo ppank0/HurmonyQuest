@@ -1,3 +1,5 @@
+using NLog.Web;
+using UsersService.API.Extensions;
 
 namespace Users.Service
 {
@@ -7,12 +9,20 @@ namespace Users.Service
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            var services = builder.Services;
 
-            builder.Services.AddControllers();
+            services.AddServicesConfiguration(builder.Configuration);
+
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
+
+            // Add services to the container.
+            services.AddControllers();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+            services.AddSwaggerDocumentation();
 
             var app = builder.Build();
 
@@ -26,7 +36,6 @@ namespace Users.Service
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
