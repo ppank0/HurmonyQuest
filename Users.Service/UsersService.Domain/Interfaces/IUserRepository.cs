@@ -4,11 +4,11 @@ namespace UsersService.Domain.Interfaces
 {
     public interface IUserRepository
     {
-        Task AddAsync(UserEntity user);
-        Task<UserEntity?> GetByIdAsync(Guid id);
-        Task<IEnumerable<UserEntity>> GetAllAsync();
-        Task DeleteAsync(Guid id);
-        Task<UserEntity> GetByAuthIdAsync(string AuthId);
-        Task<UserEntity> UpdateAsync(UserEntity user);
+        Task AddAsync(UserEntity user, CancellationToken cancellationToken);
+        Task<UserEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<IEnumerable<UserEntity>> GetAllAsync(CancellationToken cancellationToken);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<UserEntity> GetByAuthIdAsync(string AuthId, CancellationToken cancellationToken);
+        Task<UserEntity> UpdateAsync(UserEntity user, CancellationToken cancellationToken);
     }
 }
