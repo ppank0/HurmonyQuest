@@ -14,7 +14,7 @@ namespace UsersService.Application.CQRS.Queries.GetUsers
     {
         public async Task<IEnumerable<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
         {
-            var users = await repository.GetAllAsync();
+            var users = await repository.GetAllAsync(cancellationToken);
 
             return mapper.Map<IEnumerable<UserDto>>(users);
         }

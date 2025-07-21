@@ -13,7 +13,7 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
 
         public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
-            var existing = await repository.GetByAuthIdAsync(request.UserDto.AuthId);
+            var existing = await repository.GetByAuthIdAsync(request.UserDto.AuthId, cancellationToken);
 
             if(existing is not null)
             {
@@ -22,7 +22,7 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
 
             var user = mapper.Map<UserEntity>(request.UserDto);
 
-            await repository.AddAsync(user);
+            await repository.AddAsync(user, cancellationToken);
 
             return mapper.Map<UserDto>(user);
         }

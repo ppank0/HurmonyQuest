@@ -8,15 +8,15 @@ namespace UsersService.Infrastructure.Repositories
 {
     public class UserRepository(UsersDBContext context) : IUserRepository
     {
-        public async Task AddAsync(UserEntity user)
+        public async Task AddAsync(UserEntity user, CancellationToken cancellationToken)
         {
             var createdUser = context.Users.Add(user);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
-            var entityToDelete = await context.Users.FindAsync(id);
+            var entityToDelete = await context.Users.FindAsync(id, cancellationToken);
 
             if (entityToDelete is null)
             {
@@ -24,22 +24,22 @@ namespace UsersService.Infrastructure.Repositories
             }
 
             context.Users.Remove(entityToDelete);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<UserEntity>> GetAllAsync()
+        public async Task<IEnumerable<UserEntity>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await context.Users.ToListAsync();
+            return await context.Users.ToListAsync(cancellationToken);
         }
 
-        public async Task<UserEntity> GetByAuthIdAsync(string AuthId)
+        public async Task<UserEntity> GetByAuthIdAsync(string AuthId, CancellationToken cancellationToken)
         {
             if(AuthId is null)
             {
                 throw new ArgumentNullException(nameof(AuthId));
             }
 
-            var result = await context.Users.FirstAsync(x => x.AuthId == AuthId);
+            var result = await context.Users.FirstAsync(x => x.AuthId == AuthId, cancellationToken);
 
             if (result is null)
             {
@@ -49,9 +49,9 @@ namespace UsersService.Infrastructure.Repositories
             return result;
         }
 
-        public async Task<UserEntity?> GetByIdAsync(Guid id)
+        public async Task<UserEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await context.Users.FindAsync(id);
+            var user = await context.Users.FindAsync(id, cancellationToken);
 
             if (user is null)
             {
@@ -61,10 +61,10 @@ namespace UsersService.Infrastructure.Repositories
             return user;
         }
 
-        public async Task<UserEntity> UpdateAsync(UserEntity user)
+        public async Task<UserEntity> UpdateAsync(UserEntity user, CancellationToken cancellationToken)
         {
             context.Users.Update(user);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
             return user;
         }
     }
