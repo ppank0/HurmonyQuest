@@ -28,10 +28,10 @@ namespace UsersService.Tests.HandlersTests
         CreateUserHandler handler)
         {
             // Arrange
-            userRepository.GetByAuthIdAsync(command.UserDto.AuthId)
+            userRepository.GetByAuthIdAsync(command.UserDto.AuthId, CancellationToken.None)
                 .Returns((UserEntity?)null);
 
-            userRepository.AddAsync(Arg.Any<UserEntity>())
+            userRepository.AddAsync(Arg.Any<UserEntity>(), CancellationToken.None)
                 .Returns(Task.CompletedTask);
 
             var userEntity = mapper.Map<UserEntity>(command.UserDto);
@@ -43,7 +43,7 @@ namespace UsersService.Tests.HandlersTests
 
             // Assert
             result.Should().BeEquivalentTo(userDto);
-            await userRepository.Received(1).AddAsync(Arg.Any<UserEntity>());
+            await userRepository.Received(1).AddAsync(Arg.Any<UserEntity>(), CancellationToken.None);
         }
 
         [Theory]
@@ -55,7 +55,7 @@ namespace UsersService.Tests.HandlersTests
             CreateUserHandler handler)
         {
             //Arrange
-            userRepository.GetByAuthIdAsync(command.UserDto.AuthId).Returns(userEntity);
+            userRepository.GetByAuthIdAsync(command.UserDto.AuthId, CancellationToken.None).Returns(userEntity);
 
             //Act
             var result = async () => await handler.Handle(command, CancellationToken.None);
@@ -73,8 +73,8 @@ namespace UsersService.Tests.HandlersTests
             DeleteUserHandler handler)
         {
             //Arrange
-            userRepository.GetByIdAsync(id).Returns(userToDelete);
-            userRepository.DeleteAsync(id).Returns(Task.CompletedTask);
+            userRepository.GetByIdAsync(id, CancellationToken.None).Returns(userToDelete);
+            userRepository.DeleteAsync(id, CancellationToken.None).Returns(Task.CompletedTask);
 
             //Act
             var result = async () => await handler.Handle(new DeleteUserCommand(id), CancellationToken.None);
@@ -91,7 +91,7 @@ namespace UsersService.Tests.HandlersTests
             DeleteUserHandler handler)
         {
             //Arrange
-            userRepository.GetByIdAsync(id).Returns((UserEntity)null);
+            userRepository.GetByIdAsync(id, CancellationToken.None).Returns((UserEntity)null);
 
             //Act
             var result = async () => await handler.Handle(new DeleteUserCommand(id), CancellationToken.None);
@@ -109,10 +109,10 @@ namespace UsersService.Tests.HandlersTests
             UpdateUserHandler handler)
         {
             //Arrange
-            userRepository.GetByIdAsync(command.Id).Returns(userToUpdate);
+            userRepository.GetByIdAsync(command.Id, CancellationToken.None).Returns(userToUpdate);
             userToUpdate.UserPictureUrl = command.UserDto.UserPictureUrl;
 
-            userRepository.UpdateAsync(userToUpdate).Returns(userToUpdate);
+            userRepository.UpdateAsync(userToUpdate, CancellationToken.None).Returns(userToUpdate);
             UserDto userDto = mapper.Map<UserDto>(userToUpdate);
 
             //Act
@@ -130,7 +130,7 @@ namespace UsersService.Tests.HandlersTests
             UpdateUserHandler handler)
         {
             //Arrange
-            userRepository.GetByIdAsync(command.Id).Returns((UserEntity)null);
+            userRepository.GetByIdAsync(command.Id, CancellationToken.None).Returns((UserEntity)null);
 
             //Act
             var result = async () => await handler.Handle(command, CancellationToken.None);
@@ -147,7 +147,7 @@ namespace UsersService.Tests.HandlersTests
             GetUsersHandler handler)
         {
             //Arrange
-            userRepository.GetAllAsync().Returns(users);
+            userRepository.GetAllAsync(CancellationToken.None).Returns(users);
             var usersDto = mapper.Map<IEnumerable<UserDto>>(users);
             //Act
             var result = await handler.Handle(new GetUsersQuery(), CancellationToken.None);
@@ -167,7 +167,7 @@ namespace UsersService.Tests.HandlersTests
         {
             // Arrange
             existingUser.Id = userId;
-            userRepository.GetByIdAsync(userId).Returns(existingUser);
+            userRepository.GetByIdAsync(userId, CancellationToken.None).Returns(existingUser);
             var userDto = mapper.Map<UserDto>(existingUser);
 
             // Act
@@ -175,7 +175,7 @@ namespace UsersService.Tests.HandlersTests
 
             // Assert
             result.Should().BeEquivalentTo(userDto);
-            await userRepository.Received(1).GetByIdAsync(userId);
+            await userRepository.Received(1).GetByIdAsync(userId, CancellationToken.None);
         }
 
         [Theory]
@@ -186,7 +186,7 @@ namespace UsersService.Tests.HandlersTests
             GetUserHandler handler)
         {
             // Arrange
-            userRepository.GetByIdAsync(userId).Returns((UserEntity?)null);
+            userRepository.GetByIdAsync(userId, CancellationToken.None).Returns((UserEntity?)null);
 
             // Act
             Func<Task> act = async () => await handler.Handle(new GetUserQuery(userId), CancellationToken.None);
