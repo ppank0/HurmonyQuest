@@ -1,3 +1,5 @@
+using NLog.Web;
+using UsersService.API.Extensions;
 
 using UsersService.API.Extensions;
 
@@ -12,6 +14,9 @@ namespace Users.Service
             var services = builder.Services;
 
             services.AddServicesConfiguration(builder.Configuration);
+
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
 
             // Add services to the container.
             services.AddControllers();
@@ -33,7 +38,6 @@ namespace Users.Service
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

@@ -14,6 +14,7 @@ namespace UsersService.API.Extensions
             services.AddAuth0Authentication(configuration);
             services.ConfigureMediatR();
             services.AddAutoMapper(typeof(UserProfile));
+            ConfigureDirForNlog();
         }
         private static void AddAuth0Authentication(this IServiceCollection services, IConfiguration configuration)
         {
@@ -31,5 +32,10 @@ namespace UsersService.API.Extensions
         private static void ConfigureMediatR(this IServiceCollection services) =>
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationMarker).Assembly));
 
+        private static void ConfigureDirForNlog()
+        {
+            var appBasePath = Directory.GetCurrentDirectory(); 
+            NLog.GlobalDiagnosticsContext.Set("appbasepath", appBasePath);
+        }
     }
 }
