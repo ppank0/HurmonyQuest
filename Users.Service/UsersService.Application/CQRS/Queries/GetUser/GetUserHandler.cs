@@ -10,7 +10,7 @@ namespace UsersService.Application.CQRS.Queries.GetUser
     {
         public async Task<UserDto> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
-            var user = await repository.GetByIdAsync(request.id);
+            var user = await repository.GetByIdAsync(request.id, cancellationToken);
 
             if (user is null)
             {

@@ -8,14 +8,14 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.DeleteUser
     {
         public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            var userToDelete = await repository.GetByIdAsync(request.Id);
+            var userToDelete = await repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (userToDelete is null)
             {
                 throw new NotFoundException(request.Id);
             }
 
-            await repository.DeleteAsync(request.Id);
+            await repository.DeleteAsync(request.Id, cancellationToken);
         }
     }
 }

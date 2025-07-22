@@ -10,7 +10,7 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.UpdateUser
     {
         public async Task<UserDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            var userToUpdate = await repository.GetByIdAsync(request.Id);
+            var userToUpdate = await repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (userToUpdate is null)
             {
@@ -19,7 +19,7 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.UpdateUser
 
             userToUpdate.UserPictureUrl = request.UserDto.UserPictureUrl;
 
-            var updatedUser = await repository.UpdateAsync(userToUpdate);
+            var updatedUser = await repository.UpdateAsync(userToUpdate, cancellationToken);
 
             return mapper.Map<UserDto>(updatedUser);
         }

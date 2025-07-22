@@ -18,43 +18,43 @@ namespace UsersService.API.Controllers
     {
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
         {
-            var users = await mediator.Send(new GetUsersQuery());
+            var users = await mediator.Send(new GetUsersQuery(), cancellationToken);
 
             return Ok(users);
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByIdAsync(Guid id)
+        public async Task<IActionResult> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await mediator.Send(new GetUserQuery(id));
+            var user = await mediator.Send(new GetUserQuery(id), cancellationToken);
 
             return Ok(user);
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateUserDto userDto)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateUserDto userDto, CancellationToken cancellationToken)
         {
-            var newUser = await mediator.Send(new CreateUserCommand(userDto));
+            var newUser = await mediator.Send(new CreateUserCommand(userDto), cancellationToken);
 
             return Ok(newUser);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateUserDto userDto)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdateUserDto userDto, CancellationToken cancellationToken)
         {
-            await mediator.Send(new UpdateUserCommand(id, userDto));
+            await mediator.Send(new UpdateUserCommand(id, userDto), cancellationToken);
 
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
-            await mediator.Send(new DeleteUserCommand(id));
+            await mediator.Send(new DeleteUserCommand(id), cancellationToken);
 
             return NoContent();
         }
