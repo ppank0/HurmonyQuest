@@ -91,7 +91,7 @@ namespace UsersService.Tests.HandlersTests
             DeleteUserHandler handler)
         {
             //Arrange
-            userRepository.GetByIdAsync(id, CancellationToken.None).Returns((UserEntity)null);
+            userRepository.GetByIdAsync(id, CancellationToken.None).Returns((UserEntity?)null);
 
             //Act
             var result = async () => await handler.Handle(new DeleteUserCommand(id), CancellationToken.None);
@@ -130,7 +130,7 @@ namespace UsersService.Tests.HandlersTests
             UpdateUserHandler handler)
         {
             //Arrange
-            userRepository.GetByIdAsync(command.Id, CancellationToken.None).Returns((UserEntity)null);
+            userRepository.GetByIdAsync(command.Id, CancellationToken.None).Returns((UserEntity?)null);
 
             //Act
             var result = async () => await handler.Handle(command, CancellationToken.None);

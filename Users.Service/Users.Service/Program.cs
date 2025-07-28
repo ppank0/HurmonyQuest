@@ -1,8 +1,6 @@
 using NLog.Web;
 using UsersService.API.Extensions;
 
-using UsersService.API.Extensions;
-
 namespace Users.Service
 {
     public class Program
