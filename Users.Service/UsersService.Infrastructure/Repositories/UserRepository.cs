@@ -24,6 +24,7 @@ namespace UsersService.Infrastructure.Repositories
             }
 
             context.Users.Remove(entityToDelete);
+
             await context.SaveChangesAsync(cancellationToken);
         }
 
@@ -33,6 +34,7 @@ namespace UsersService.Infrastructure.Repositories
         }
 
         public async Task<UserEntity> GetByAuthIdAsync(string AuthId, CancellationToken cancellationToken)
+
         {
             if(AuthId is null)
             {
@@ -64,7 +66,9 @@ namespace UsersService.Infrastructure.Repositories
         public async Task<UserEntity> UpdateAsync(UserEntity user, CancellationToken cancellationToken)
         {
             context.Users.Update(user);
+            
             await context.SaveChangesAsync(cancellationToken);
+
             return user;
         }
     }

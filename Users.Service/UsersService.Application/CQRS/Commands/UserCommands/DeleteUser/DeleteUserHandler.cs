@@ -4,7 +4,7 @@ using UsersService.Domain.Exceptions;
 
 namespace UsersService.Application.CQRS.Commands.UserCommands.DeleteUser
 {
-    internal class DeleteUserHandler(IUserRepository repository) : IRequestHandler<DeleteUserCommand>
+    public class DeleteUserHandler(IUserRepository repository) : IRequestHandler<DeleteUserCommand>
     {
         public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
