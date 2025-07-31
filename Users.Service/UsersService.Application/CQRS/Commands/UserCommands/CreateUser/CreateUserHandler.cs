@@ -1,10 +1,9 @@
-﻿using MediatR;
-using UsersService.Domain.Entities;
-using UsersService.Domain.Interfaces;
+﻿using AutoMapper;
+using MediatR;
 using UsersService.Application.DTOs;
+using UsersService.Domain.Entities;
 using UsersService.Domain.Exceptions;
-using AutoMapper;
-using System.Net;
+using UsersService.Domain.Interfaces;
 
 namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
 {
@@ -15,7 +14,7 @@ namespace UsersService.Application.CQRS.Commands.UserCommands.CreateUser
         {
             var existing = await repository.GetByAuthIdAsync(request.UserDto.AuthId, cancellationToken);
 
-            if(existing is not null)
+            if (existing is not null)
             {
                 throw new ConflictException("User already exists");
             }
