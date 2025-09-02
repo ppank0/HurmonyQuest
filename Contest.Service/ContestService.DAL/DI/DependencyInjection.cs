@@ -46,6 +46,8 @@ public static class DependencyInjection
 
         services.AddScoped<INominationRepository, NominationRepository>();
 
+        services.AddScoped<IParticipantRepository, ParticipantRepository>();
+
         return services;
     }
 }
