@@ -9,7 +9,7 @@ export default function Layout() {
       <Header/>
 
       {/* Здесь будут меняться страницы */}
-      <Box component="main" sx={{ flex: 1, p: 3 }}>
+      <Box component="main" sx={{ flex: 1}}>
         <Outlet />  
       </Box>
 

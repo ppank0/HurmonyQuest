@@ -30,13 +30,13 @@ export const theme = createTheme({
         primary: {
             light: '#b5b5b5',
             main: '#787878',
-            dark: '#000',
+            dark: '#0F0F0F' ,
             contrastText: '#fff',
         },
         secondary: {
         light: '#556b2f',
         main: '#122d48ff', 
-        dark: '#620000ff',
+        dark: '#780B0B',
         contrastText: '#fff',
     },
    },
@@ -51,8 +51,11 @@ export const theme = createTheme({
                 fontStyle: 'italic',
                 fontWeight: 'bold',
                 '&:hover': {
-                    backgroundColor: '#202020',
+                    backgroundColor: '#780B0B',
                     },
+                // '&:hover': {
+                //     backgroundColor: '#202020',
+                //     },
                 },
             },
         },
@@ -61,7 +64,7 @@ export const theme = createTheme({
                 root:{
                     color: '#787878',
                     '&:hover': {
-                        color: '#202020'
+                        color: '#ffff'
                     }
                 },
             },
