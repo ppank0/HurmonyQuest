@@ -12,3 +12,31 @@ export interface JuryItem {
     surname: string;
     birthday: string;
 }
+
+export interface ParticipantItem {
+    id: Guid;
+    name: string;
+    surname: string;
+    birthday: string;
+    musicalInstrumentId: Guid;
+    musicalInstrumentName: string
+    nominationId: Guid;
+}
+
+export interface NominationItem {
+    id: Guid;
+    name: string;
+    musicalInstrumentId: Guid;
+    musicalInstrumentName: string
+}
+
+export interface CreateNominationItem {
+    name: string;
+}
+
+export interface User{
+    id: Guid,
+    email: string,
+    userPictureUrl: string,
+    authId: string,
+}

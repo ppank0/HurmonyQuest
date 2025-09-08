@@ -1,17 +1,19 @@
 import axios, { AxiosRequestHeaders, InternalAxiosRequestConfig } from 'axios';
 
-// Создаём базовый экземпляр axios с адресом API
-export const $host = axios.create({
-  baseURL: process.env.REACT_API_URL, // например, http://localhost:7057/api
+const $host = axios.create({
+  baseURL: process.env.REACT_API_URL, 
 });
 
-// Интерсептор добавляет токен к каждому запросу
-$host.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem('token'); // берём токен из localStorage
+const $authHost = axios.create({
+  baseURL: process.env.REACT_APP_AUTH0_AUDIENCE, 
+});
+
+$authHost.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const token = localStorage.getItem('token'); 
   if (token) {
     config.headers = {
       ...config.headers,
-      Authorization: `Bearer ${token}`, // добавляем заголовок Authorization
+      Authorization: `Bearer ${token}`, 
     } as AxiosRequestHeaders;
   }
   return config;
@@ -20,3 +22,7 @@ $host.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 
+export{
+  $host,
+  $authHost
+}

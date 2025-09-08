@@ -1,16 +1,18 @@
-import { Route, Routes } from 'react-router-dom';
-import { HomePage } from '../pages/HomePage';
-import Header from '../shared/components/Header'
-import {GetAllJuries} from '../features/contest/jury/GetAllJuries'
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from '../shared/layout/Layout'
+import { publicRoutes, privateRoutes } from '../shared/config/routes';
 
 
 export const Router = () => (
-  <Routes>
-    <Route path="/" element={<Layout />} >
-      <Route index element={<HomePage/>} />
-      {/* добавляешь другие страницы здесь */}
-      <Route path="api/" element = {<GetAllJuries/>} />
-    </Route>
-  </Routes>
+    <Routes>
+      <Route path="/" element={<Layout />} >
+        {privateRoutes.map((r) => (
+          <Route key={r.path} path={r.path} element={<r.component/>} />
+        ))}
+        {publicRoutes.map((r) => (
+          <Route key={r.path} path={r.path} element={<r.component />} />
+        ))}
+        <Route path="*" element={<Navigate to='/' />} />
+      </Route>
+    </Routes>  
 );
