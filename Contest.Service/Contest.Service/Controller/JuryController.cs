@@ -13,6 +13,7 @@ namespace ContestService.API.Controller;
 public class JuryController(IMapper mapper, IJuryService juryService) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<List<JuryDto>> GetAll(CancellationToken ct)
     {
         var juries = await juryService.GetAllAsync(ct);
@@ -21,6 +22,7 @@ public class JuryController(IMapper mapper, IJuryService juryService) : Controll
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<JuryDto> Get(Guid id, CancellationToken ct)
     {
         var jury = await juryService.GetAsync(id, ct);
