@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 namespace ContestService.BLL.Tests.ServiceTests;
 public class ParticipantServiceTests
 {
-    private readonly Mock<IRepositoryBase<Participant>> _repositoryMock = new();
+    private readonly Mock<IParticipantRepository> _repositoryMock = new();
     private readonly Mock<INominationRepository> _nominationRepoMock = new();
     private readonly IMapper _mapper;
     private readonly ParticipantService _service;
@@ -126,7 +126,7 @@ public class ParticipantServiceTests
         } };
         var models = _mapper.Map<List<ParticipantModel>>(entities);
 
-        _repositoryMock.Setup(r => r.GetAllToListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.GetAllWithRelationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
 
         //Act
         var result = await _service.GetAllAsync(CancellationToken.None);
