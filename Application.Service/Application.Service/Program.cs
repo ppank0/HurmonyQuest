@@ -1,4 +1,6 @@
 
+using Application.Service.DI;
+
 namespace Application.Service
 {
     public class Program
@@ -14,6 +16,7 @@ namespace Application.Service
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddApiDependencies(builder.Configuration);
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
