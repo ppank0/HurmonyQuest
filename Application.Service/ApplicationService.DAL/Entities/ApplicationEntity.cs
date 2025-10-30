@@ -8,7 +8,7 @@ namespace ApplicationService.DAL.Entities
         public Guid NominationId { get; set; }
         public Guid InstrumentId { get; set; }
 
-        public ApplicationStatus Status { get; set; } = ApplicationStatus.Review;
+        public ApplicationStatus Status { get; set; } = ApplicationStatus.RendingReview;
         public Guid VideoId { get; set; }
         public VideoEntity? Video { get; set; }
     }

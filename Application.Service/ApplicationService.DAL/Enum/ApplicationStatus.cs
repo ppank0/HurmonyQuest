@@ -2,8 +2,8 @@
 {
     public enum ApplicationStatus
     {
-        Review,
-        Approved,
-        Rejected
+        RendingReview = 0,
+        Approved = 1,
+        Rejected = 2
     }
 }
