@@ -30,23 +30,15 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IRepositoryBase<Jury>, RepositoryBase<Jury>>();
-        services.Decorate<IRepositoryBase<Jury>, CachedRepositoryDecorator<Jury>>();
-
         services.AddScoped<IRepositoryBase<MusicalInstrument>, RepositoryBase<MusicalInstrument>>();
-        services.Decorate<IRepositoryBase<MusicalInstrument>, CachedRepositoryDecorator<MusicalInstrument>>();
-
         services.AddScoped<IRepositoryBase<Nomination>, RepositoryBase<Nomination>>();
-        services.Decorate<IRepositoryBase<Nomination>, CachedRepositoryDecorator<Nomination>>();
-
         services.AddScoped<IRepositoryBase<Participant>, RepositoryBase<Participant>>();
-        services.Decorate<IRepositoryBase<Participant>, CachedRepositoryDecorator<Participant>>();
-
         services.AddScoped<IRepositoryBase<Stage>, RepositoryBase<Stage>>();
-        services.Decorate<IRepositoryBase<Stage>, CachedRepositoryDecorator<Stage>>();
 
         services.AddScoped<INominationRepository, NominationRepository>();
-
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
+
+        services.Decorate(typeof(IRepositoryBase<>), typeof(CachedRepositoryDecorator<>));
 
         return services;
     }
