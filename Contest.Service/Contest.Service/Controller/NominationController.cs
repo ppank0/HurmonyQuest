@@ -13,6 +13,7 @@ namespace ContestService.API.Controller;
 public class NominationController(INominationService nominationService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<List<NominationDto>> GetAll(CancellationToken ct)
     {
         var result = await nominationService.GetAllAsync(ct);
@@ -21,6 +22,7 @@ public class NominationController(INominationService nominationService, IMapper 
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<NominationDto> Get(Guid id, CancellationToken ct)
     {
         var result = await nominationService.GetAsync(id, ct);

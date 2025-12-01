@@ -1,19 +1,21 @@
 ﻿using ContestService.DAL.Context;
 using ContestService.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using System.Linq.Expressions;
-using System.Text.Json;
 
 namespace ContestService.DAL.Repositories.Implementations;
 
-public class RepositoryBase<T>(AppDbContext context) : IRepositoryBase<T> where T : class
+public class RepositoryBase<T>: IRepositoryBase<T> where T : class
 {
-    protected readonly AppDbContext _context = context;
+    protected readonly AppDbContext _context;
+    public RepositoryBase(AppDbContext context)
+    {
+        _context = context;
+    }
 
     public async Task<T> CreateAsync(T entity, CancellationToken ct)
     {
-        var created =_context.Set<T>().Add(entity);
+        var created = _context.Set<T>().Add(entity);
         await _context.SaveChangesAsync(ct);
         return created.Entity;
     }
