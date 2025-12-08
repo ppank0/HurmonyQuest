@@ -9,6 +9,7 @@ namespace ApplicationService.BLL.Mapper
         public MapperProfile()
         {
             CreateMap<VideoEntity, VideoModel>().ReverseMap();
+            CreateMap<ApplicationEntity, ApplicationModel>().ReverseMap();
         }
     }
 }

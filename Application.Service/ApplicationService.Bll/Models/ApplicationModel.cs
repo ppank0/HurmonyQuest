@@ -1,8 +1,8 @@
 ﻿using ApplicationService.DAL.Enum;
 
-namespace ApplicationService.BLL.CQRS.DTOs
+namespace ApplicationService.BLL.Models
 {
-    public class ApplicationDto
+    public class ApplicationModel
     {
         public Guid Id { get; set; }
         public string ParticipantName { get; set; } = string.Empty;

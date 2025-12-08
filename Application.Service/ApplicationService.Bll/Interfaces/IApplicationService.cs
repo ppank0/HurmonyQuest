@@ -1,16 +1,14 @@
-﻿using ApplicationService.BLL.CQRS.Command.ApplicationCommands.Create;
-using ApplicationService.BLL.CQRS.Command.ApplicationCommands.Delete;
-using ApplicationService.BLL.CQRS.Command.ApplicationCommands.Update;
-using ApplicationService.BLL.CQRS.DTOs;
+﻿using ApplicationService.BLL.Models;
+using ApplicationService.BLL.Models.Requests;
 
 namespace ApplicationService.BLL.Interfaces
 {
     public interface IApplicationService
     {
-        Task<ApplicationDto> CreateAsync(CreateApplicationCommand request, CancellationToken ct);
-        Task<List<ApplicationDto>> GetAllAsync(CancellationToken ct);
-        Task<ApplicationDto> GetByIdAsync(Guid id, CancellationToken ct);
-        Task<ApplicationDto> UpdateAsync(UpdateApplicationCommand request, CancellationToken ct);
-        Task DeleteAsync(DeleteApplicationCommand request, CancellationToken ct);
+        Task<ApplicationModel> CreateAsync(CreateApplicationRequest request, CancellationToken ct);
+        Task<List<ApplicationModel>> GetAllAsync(CancellationToken ct);
+        Task<ApplicationModel> GetByIdAsync(Guid id, CancellationToken ct);
+        Task<ApplicationModel> UpdateAsync(UpdateApplicationRequest request, CancellationToken ct);
+        Task DeleteAsync(Guid id, CancellationToken ct);
     }
 }

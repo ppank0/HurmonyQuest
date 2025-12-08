@@ -1,24 +1,23 @@
-﻿using ApplicationService.BLL.CQRS.Command.ApplicationCommands.Create;
-using ApplicationService.BLL.CQRS.Command.ApplicationCommands.Delete;
-using ApplicationService.BLL.CQRS.Command.ApplicationCommands.Update;
-using ApplicationService.BLL.CQRS.DTOs;
-using ApplicationService.BLL.Exeptions;
+﻿using ApplicationService.BLL.Exeptions;
 using ApplicationService.BLL.Integrations.Contracts.Instruments;
 using ApplicationService.BLL.Integrations.Contracts.Instruments.DTOs;
 using ApplicationService.BLL.Integrations.Contracts.Participant;
 using ApplicationService.BLL.Integrations.Contracts.Participants.DTOs;
 using ApplicationService.BLL.Interfaces;
+using ApplicationService.BLL.Models;
+using ApplicationService.BLL.Models.Requests;
 using ApplicationService.DAL.Entities;
 using ApplicationService.DAL.Enum;
 using ApplicationService.DAL.UnitOfWork;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationService.BLL.Services
 {
-    public class ApplicationService(IUnitOfWork _uOw,
+    public class ApplicationService(IMapper mapper, IUnitOfWork _uOw,
         IParticipantHttpClient _participant, IInstrumentHttpClient _instrument, IVideoService _videoService) : IApplicationService
     {
-        public async Task<ApplicationDto> CreateAsync(CreateApplicationCommand request, CancellationToken ct)
+        public async Task<ApplicationModel> CreateAsync(CreateApplicationRequest request, CancellationToken ct)
         {
             var participant = await _participant.CreateAsync((new ParticipantCreateRequest(request.Name, request.Surname, request.Birthday,
                                             request.MusicalInstrumentId, request.NominationId)), ct);
@@ -36,7 +35,7 @@ namespace ApplicationService.BLL.Services
             await _uOw.Applications.CreateAsync(appEntity, ct);
             await _uOw.SaveAsync(ct);
 
-            return new ApplicationDto()
+            return new ApplicationModel()
             {
                 Id = appEntity.Id,
                 ParticipantName = request.Name,
@@ -48,26 +47,33 @@ namespace ApplicationService.BLL.Services
             };
         }
 
-        public async Task DeleteAsync(DeleteApplicationCommand request, CancellationToken ct)
+        public async Task DeleteAsync(Guid id, CancellationToken ct)
         {
-            var application = await _uOw.Applications.FindByCondition(x => x.Id == request.id, ct).FirstOrDefaultAsync(ct);
+            var application = await _uOw.Applications.FindByCondition(x => x.Id == id, ct).FirstOrDefaultAsync(ct);
 
             if (application is null)
             {
-                throw new NotFoundException($"Application with id: {request.id} was not found");
+                throw new NotFoundException($"Application with id: {id} was not found");
             }
             await _participant.DeleteAsync(application.ParticipantId, ct);
             await _videoService.DeleteAsync(application.VideoId, ct);
-            
+
             await _uOw.SaveAsync(ct);
         }
 
-        public Task<List<ApplicationDto>> GetAllAsync(CancellationToken ct)
+        public async Task<List<ApplicationModel>> GetAllAsync(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var applications = await _uOw.Applications.GetAllAsync(ct);
+
+            if(applications.Count() == 0)
+            {
+                throw new NotFoundException("There are no applications");
+            }
+
+            return mapper.Map<List<ApplicationModel>>(applications);
         }
 
-        public async Task<ApplicationDto> GetByIdAsync(Guid id, CancellationToken ct)
+        public async Task<ApplicationModel> GetByIdAsync(Guid id, CancellationToken ct)
         {
             var application = await _uOw.Applications.FindByCondition(x => x.Id == id, ct).FirstOrDefaultAsync(ct);
             if (application is null)
@@ -76,7 +82,7 @@ namespace ApplicationService.BLL.Services
             }
 
             var additionalData = await GetDetailedInfoAsync(application, ct);
-            return new ApplicationDto
+            return new ApplicationModel
             {
                 Id = id,
                 ParticipantName = additionalData.Item2.Name,
@@ -87,7 +93,7 @@ namespace ApplicationService.BLL.Services
             };
         }
 
-        public async Task<ApplicationDto> UpdateAsync(UpdateApplicationCommand request, CancellationToken ct)
+        public async Task<ApplicationModel> UpdateAsync(UpdateApplicationRequest request, CancellationToken ct)
         {
             var application = await _uOw.Applications.FindByCondition(x => x.Id == request.id, ct).FirstOrDefaultAsync();
             if (application is null)
