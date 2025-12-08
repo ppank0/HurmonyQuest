@@ -15,6 +15,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Application.Service/Application.Service.csproj", "Application.Service/"]
+COPY ["ApplicationService.Bll/ApplicationService.BLL.csproj", "ApplicationService.Bll/"]
+COPY ["ApplicationService.DAL/ApplicationService.DAL.csproj", "ApplicationService.DAL/"]
 RUN dotnet restore "./Application.Service/Application.Service.csproj"
 COPY . .
 WORKDIR "/src/Application.Service"
