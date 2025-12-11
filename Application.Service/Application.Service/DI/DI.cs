@@ -14,7 +14,6 @@ namespace Application.Service.DI
         {
             services.AddAutoMapper(typeof(MapperProfile));
             services.AddBLLDependencies(configuration);
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationService.BLL.DI.DI).Assembly));
             services.Configure<ParticipantsOptions>(configuration.GetSection("Participants"));
             services.Configure<InstrumentsOptions>(configuration.GetSection("Instruments"));
 
@@ -22,7 +21,7 @@ namespace Application.Service.DI
             {
                 var opt = sp.GetRequiredService<IOptions<ParticipantsOptions>>().Value;
                 http.BaseAddress = new Uri(opt.BaseUrl);
-                http.Timeout = Timeout.InfiniteTimeSpan;
+                http.Timeout = TimeSpan.FromSeconds(3);
                 if (!string.IsNullOrWhiteSpace(opt.ApiKey))
                     http.DefaultRequestHeaders.Add("X-Api-Key", opt.ApiKey);
             });
@@ -31,7 +30,7 @@ namespace Application.Service.DI
             {
                 var opt = sp.GetRequiredService<IOptions<InstrumentsOptions>>().Value;
                 http.BaseAddress = new Uri(opt.BaseUrl);
-                http.Timeout = Timeout.InfiniteTimeSpan;
+                http.Timeout = TimeSpan.FromMinutes(2);
                 if (!string.IsNullOrWhiteSpace(opt.ApiKey))
                     http.DefaultRequestHeaders.Add("X-Api-Key", opt.ApiKey);
             });
