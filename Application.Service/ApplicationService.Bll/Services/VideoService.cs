@@ -25,12 +25,12 @@ namespace ApplicationService.BLL.Services
         {
             await videoStorage.EnsureBucketExists(BucketName, ct);
             await videoStorage.PutObjectAsync(BucketName, objName, contentType, data, ct);
-            var videoModel = new VideoModel() { VideoUrl = objName };
-            var video = await uOw.Videos.CreateAsync(mapper.Map<VideoEntity>(videoModel), ct);
+            var videoEntity = new VideoEntity() { VideoUrl = objName };
+            await uOw.Videos.CreateAsync(videoEntity, ct);
 
             await uOw.SaveAsync(ct);
 
-            return mapper.Map<VideoModel>(video);
+            return mapper.Map<VideoModel>(videoEntity);
         }
 
         public async Task DeleteAsync(Guid id, CancellationToken ct)
