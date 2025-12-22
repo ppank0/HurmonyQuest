@@ -1,6 +1,5 @@
 ﻿using ApplicationService.BLL.Exeptions;
 using ApplicationService.BLL.Integrations.Contracts.Instruments;
-using ApplicationService.BLL.Integrations.Contracts.Instruments.DTOs;
 using ApplicationService.BLL.Integrations.Contracts.Participant;
 using ApplicationService.BLL.Integrations.Contracts.Participants.DTOs;
 using ApplicationService.BLL.Interfaces;
@@ -14,14 +13,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationService.BLL.Services
 {
-    public class ApplicationService(IMapper mapper, IUnitOfWork _uOw,
-        IParticipantHttpClient _participant, IInstrumentHttpClient _instrument, IVideoService _videoService) : IApplicationService
+    public class ApplicationService(IMapper mapper, IUnitOfWork unitOfWork,
+        IParticipantHttpClient participantClient, IInstrumentHttpClient instrumentClient, IVideoService videoService) : IApplicationService
     {
         public async Task<ApplicationModel> CreateAsync(CreateApplicationRequest request, CancellationToken ct)
         {
-            var participant = await _participant.CreateAsync((new ParticipantCreateRequest(request.Name, request.Surname, request.Birthday,
-                                            request.MusicalInstrumentId, request.NominationId)), ct);
-            var instrument = await _instrument.GetByIdAsync(request.MusicalInstrumentId, ct);
+            var participant = await participantClient.CreateAsync(mapper.Map<ParticipantCreateRequest>(request), ct);
+            var instrument = await instrumentClient.GetByIdAsync(request.MusicalInstrumentId, ct);
 
             var appEntity = new ApplicationEntity()
             {
@@ -32,8 +30,8 @@ namespace ApplicationService.BLL.Services
                 VideoId = request.VideoId,
             };
 
-            await _uOw.Applications.CreateAsync(appEntity, ct);
-            await _uOw.SaveAsync(ct);
+            await unitOfWork.Applications.CreateAsync(appEntity, ct);
+            await unitOfWork.SaveAsync(ct);
 
             return new ApplicationModel()
             {
@@ -49,23 +47,23 @@ namespace ApplicationService.BLL.Services
 
         public async Task DeleteAsync(Guid id, CancellationToken ct)
         {
-            var application = await _uOw.Applications.FindByCondition(x => x.Id == id, ct).FirstOrDefaultAsync(ct);
+            var application = await unitOfWork.Applications.FindByCondition(x => x.Id == id, ct).FirstOrDefaultAsync(ct);
 
             if (application is null)
             {
                 throw new NotFoundException($"Application with id: {id} was not found");
             }
-            await _participant.DeleteAsync(application.ParticipantId, ct);
-            await _videoService.DeleteAsync(application.VideoId, ct);
+            await participantClient.DeleteAsync(application.ParticipantId, ct);
+            await videoService.DeleteAsync(application.VideoId, ct);
 
-            await _uOw.SaveAsync(ct);
+            await unitOfWork.SaveAsync(ct);
         }
 
         public async Task<List<ApplicationModel>> GetAllAsync(CancellationToken ct)
         {
-            var applications = await _uOw.Applications.GetAllAsync(ct);
+            var applications = await unitOfWork.Applications.GetAllAsync(ct);
 
-            if(applications.Count() == 0)
+            if (applications.Count() == 0)
             {
                 throw new NotFoundException("There are no applications");
             }
@@ -75,44 +73,38 @@ namespace ApplicationService.BLL.Services
 
         public async Task<ApplicationModel> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            var application = await _uOw.Applications.FindByCondition(x => x.Id == id, ct).FirstOrDefaultAsync(ct);
+            var application = await unitOfWork.Applications.FindByCondition(x => x.Id == id, ct).FirstOrDefaultAsync(ct);
             if (application is null)
             {
                 throw new NotFoundException($"Application with id: {id} was not found");
             }
 
-            var additionalData = await GetDetailedInfoAsync(application, ct);
+            var instrument = await instrumentClient.GetByIdAsync(application.InstrumentId, ct);
+            var participant = await participantClient.GetAsync(application.ParticipantId, ct);
+
             return new ApplicationModel
             {
                 Id = id,
-                ParticipantName = additionalData.Item2.Name,
-                ParticipantSurname = additionalData.Item2.Surname,
-                ParticipantBirthday = additionalData.Item2.Birthday,
-                InstrumentName = additionalData.Item1.Name,
+                ParticipantName = participant.Name,
+                ParticipantSurname = participant.Surname,
+                ParticipantBirthday = participant.Birthday,
+                InstrumentName = instrument.Name,
                 Status = application.Status,
             };
         }
 
         public async Task<ApplicationModel> UpdateAsync(UpdateApplicationRequest request, CancellationToken ct)
         {
-            var application = await _uOw.Applications.FindByCondition(x => x.Id == request.id, ct).FirstOrDefaultAsync();
+            var application = await unitOfWork.Applications.FindByCondition(x => x.Id == request.id, ct).FirstOrDefaultAsync();
             if (application is null)
             {
                 throw new NotFoundException($"Application with id: {request.id} was not found");
             }
             application.Status = request.status;
-            await _uOw.Applications.UpdateAsync(application, ct);
-            await _uOw.SaveAsync(ct);
+            await unitOfWork.Applications.UpdateAsync(application, ct);
+            await unitOfWork.SaveAsync(ct);
 
             return await GetByIdAsync(request.id, ct);
-        }
-
-        private async Task<(InstrumentResponse, ParticipantResponse)> GetDetailedInfoAsync(ApplicationEntity app, CancellationToken ct)
-        {
-            var instrument = await _instrument.GetByIdAsync(app.InstrumentId, ct);
-            var participant = await _participant.GetAsync(app.ParticipantId, ct);
-
-            return (instrument, participant);
         }
     }
 }

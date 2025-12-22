@@ -28,8 +28,6 @@ namespace Application.Service
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

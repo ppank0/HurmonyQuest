@@ -1,6 +1,9 @@
 ﻿using ApplicationService.BLL.Interfaces;
+using ApplicationService.BLL.Models;
 using Minio;
 using Minio.DataModel.Args;
+using Npgsql.Internal;
+using System.IO;
 
 namespace ApplicationService.BLL.Services
 {
@@ -20,7 +23,7 @@ namespace ApplicationService.BLL.Services
             if (!isExist) await _minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName), ct);
         }
 
-        public async Task<(Stream, string)> GetObjectAsync(string bucket, string objName, CancellationToken ct)
+        public async Task<FileContentResultModel> GetObjectAsync(string bucket, string objName, CancellationToken ct)
         {
             var ms = new MemoryStream();
 
@@ -28,8 +31,9 @@ namespace ApplicationService.BLL.Services
                 .WithBucket(bucket)
                 .WithObject(objName)
                 .WithCallbackStream(stream => stream.CopyTo(ms)), ct);
-
-            return (ms, file.ContentType);
+            ms.Flush();
+            ms.Position = 0;
+            return new FileContentResultModel(ms, file.ContentType, objName);
         }
 
         public async Task PutObjectAsync(string bucket, string objName, string contentType, Stream data, CancellationToken ct)

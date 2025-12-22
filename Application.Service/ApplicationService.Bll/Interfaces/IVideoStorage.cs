@@ -1,8 +1,10 @@
-﻿namespace ApplicationService.BLL.Interfaces
+﻿using ApplicationService.BLL.Models;
+
+namespace ApplicationService.BLL.Interfaces
 {
     public interface IVideoStorage
     {
-        Task<(Stream, string)> GetObjectAsync(string bucket, string objName, CancellationToken ct);
+        Task<FileContentResultModel> GetObjectAsync(string bucket, string objName, CancellationToken ct);
         Task PutObjectAsync(string bucket, string objName, string contentType, Stream data, CancellationToken ct);
 
         Task EnsureBucketExists(string bucketName, CancellationToken ct);

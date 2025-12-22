@@ -11,12 +11,7 @@ namespace ApplicationService.BLL.Services
 {
     public class VideoService(IUnitOfWork uOw, IMapper mapper, IVideoStorage videoStorage) : IVideoService
     {
-        public Task<List<VideoModel>> GetAllAsync(CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<(Stream, string)> GetAsync(string videoName, CancellationToken ct)
+        public async Task<FileContentResultModel> GetAsync(string videoName, CancellationToken ct)
         {
             return await videoStorage.GetObjectAsync(BucketName, videoName, ct);
         }

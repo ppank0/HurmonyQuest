@@ -16,9 +16,9 @@ namespace Application.Service.Controllers
         {
             await using var stream = request.File.OpenReadStream();
             var videoModel = await videoService.PutAsync(request.File.FileName, request.File.ContentType, stream, ct);
+            var createApp = mapper.Map<CreateApplicationRequest>(request) with { VideoId = videoModel.Id};
+            var newApp = await applicationService.CreateAsync(createApp, ct);
 
-            var newApp = await applicationService.CreateAsync(new CreateApplicationRequest(request.Name, request.Surname,
-                request.Birthday, request.MusicalInstrumentId, request.NominationId, videoModel.Id), ct);
             return mapper.Map<ApplicationDto>(newApp);
         }
 

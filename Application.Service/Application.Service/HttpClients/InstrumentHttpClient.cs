@@ -6,11 +6,6 @@ namespace Application.Service.HttpClients
 {
     public class InstrumentHttpClient(HttpClient _httpClient) : IInstrumentHttpClient
     {
-        public Task<List<InstrumentResponse>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<InstrumentResponse> GetByIdAsync(Guid id, CancellationToken ct)
         {
             var res = await _httpClient.GetAsync($"/api/instruments/{id}", ct);
