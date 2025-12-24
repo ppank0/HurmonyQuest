@@ -2,6 +2,6 @@
 {
     public static class MinIOConsts
     {
-        public static readonly string BucketName = "videos";
+        public static readonly string ObjectStoreName = "videos";
     }
 }

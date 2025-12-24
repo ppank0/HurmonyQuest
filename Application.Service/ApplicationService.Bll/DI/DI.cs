@@ -2,6 +2,7 @@
 using ApplicationService.BLL.Mapper;
 using ApplicationService.BLL.Services;
 using ApplicationService.DAL.DI;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
@@ -19,7 +20,7 @@ namespace ApplicationService.BLL.DI
 
             services.AddDalDependencies(configuration);
             services.AddScoped<IVideoService, VideoService>();
-            services.AddScoped<IVideoStorage, MinioStorage>();
+            services.AddScoped<IVideoStorage, BlobStorage>();
             services.AddScoped<IApplicationService, AppService>();
 
             MinioOptions = configuration.GetSection("Minio").Get<MinioOptions>();
@@ -30,6 +31,12 @@ namespace ApplicationService.BLL.DI
                  .WithCredentials(MinioOptions.AccessKey, MinioOptions.SecretKey)
                  .Build()
             );
+
+            var azureBlobConnectionString = configuration.GetConnectionString("AzureBlobConnection");
+            services.AddAzureClients(azureBuilder =>
+            {
+                azureBuilder.AddBlobServiceClient(azureBlobConnectionString);
+            });
 
             return services;
         }

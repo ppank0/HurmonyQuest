@@ -2,32 +2,29 @@
 using ApplicationService.BLL.Models;
 using Minio;
 using Minio.DataModel.Args;
-using Npgsql.Internal;
-using System.IO;
 
 namespace ApplicationService.BLL.Services
 {
     public class MinioStorage(IMinioClient minio) : IVideoStorage
     {
-        private readonly IMinioClient _minio = minio;
         public async Task DeleteObjectAsync(string bucket, string objName, CancellationToken ct)
         {
-            await _minio.RemoveObjectAsync(new RemoveObjectArgs()
+            await minio.RemoveObjectAsync(new RemoveObjectArgs()
                 .WithBucket(bucket)
                 .WithObject(objName), ct);
         }
 
-        public async Task EnsureBucketExists(string bucketName, CancellationToken ct)
+        private async Task EnsureBucketExists(string bucketName, CancellationToken ct)
         {
-            var isExist = await _minio.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName), ct);
-            if (!isExist) await _minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName), ct);
+            var isExist = await minio.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName), ct);
+            if (!isExist) await minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName), ct);
         }
 
         public async Task<FileContentResultModel> GetObjectAsync(string bucket, string objName, CancellationToken ct)
         {
             var ms = new MemoryStream();
 
-            var file = await _minio.GetObjectAsync(new GetObjectArgs()
+            var file = await minio.GetObjectAsync(new GetObjectArgs()
                 .WithBucket(bucket)
                 .WithObject(objName)
                 .WithCallbackStream(stream => stream.CopyTo(ms)), ct);
@@ -38,6 +35,7 @@ namespace ApplicationService.BLL.Services
 
         public async Task PutObjectAsync(string bucket, string objName, string contentType, Stream data, CancellationToken ct)
         {
+            await EnsureBucketExists(bucket, ct);
             var poa = new PutObjectArgs()
                     .WithBucket(bucket)
                     .WithObject(objName)
@@ -45,7 +43,7 @@ namespace ApplicationService.BLL.Services
                     .WithObjectSize(data.Length)
                     .WithContentType(contentType);
 
-            await _minio.PutObjectAsync(poa, ct);
+            await minio.PutObjectAsync(poa, ct);
         }
     }
 }

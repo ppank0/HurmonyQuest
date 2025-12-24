@@ -5,42 +5,42 @@ using ApplicationService.DAL.Entities;
 using ApplicationService.DAL.UnitOfWork;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using static ApplicationService.BLL.Consts.MinIOConsts;
+using static ApplicationService.BLL.Consts.AzureBlobConsts;
 
 namespace ApplicationService.BLL.Services
 {
-    public class VideoService(IUnitOfWork uOw, IMapper mapper, IVideoStorage videoStorage) : IVideoService
+    public class VideoService(IUnitOfWork unitOfWork, IMapper mapper, IVideoStorage videoStorage) : IVideoService
     {
         public async Task<FileContentResultModel> GetAsync(string videoName, CancellationToken ct)
         {
-            return await videoStorage.GetObjectAsync(BucketName, videoName, ct);
+            return await videoStorage.GetObjectAsync(ObjectStoreName, videoName, ct);
         }
 
         public async Task<VideoModel> PutAsync(string objName, string contentType, Stream data, CancellationToken ct)
         {
-            await videoStorage.EnsureBucketExists(BucketName, ct);
-            await videoStorage.PutObjectAsync(BucketName, objName, contentType, data, ct);
+            objName = $"{Guid.NewGuid()}{objName}";
+            await videoStorage.PutObjectAsync(ObjectStoreName, objName, contentType, data, ct);
             var videoEntity = new VideoEntity() { VideoUrl = objName };
-            await uOw.Videos.CreateAsync(videoEntity, ct);
+            await unitOfWork.Videos.CreateAsync(videoEntity, ct);
 
-            await uOw.SaveAsync(ct);
+            await unitOfWork.SaveAsync(ct);
 
             return mapper.Map<VideoModel>(videoEntity);
         }
 
         public async Task DeleteAsync(Guid id, CancellationToken ct)
         {
-            var videoModelList = uOw.Videos.FindByCondition((s => s.Id == id), ct);
+            var videoModelList = unitOfWork.Videos.FindByCondition((s => s.Id == id), ct);
             var videoModel = await videoModelList.FirstOrDefaultAsync();
             if (videoModel is null)
             {
                 throw new NotFoundException($"Video with this id: {id} was not found");
             }
 
-            await videoStorage.DeleteObjectAsync(BucketName, videoModel.VideoUrl, ct);
-            await uOw.Videos.DeleteAsync((mapper.Map<VideoEntity>(videoModel)), ct);
+            await videoStorage.DeleteObjectAsync(ObjectStoreName, videoModel.VideoUrl, ct);
+            await unitOfWork.Videos.DeleteAsync((mapper.Map<VideoEntity>(videoModel)), ct);
 
-            await uOw.SaveAsync(ct);
+            await unitOfWork.SaveAsync(ct);
         }
     }
 }
