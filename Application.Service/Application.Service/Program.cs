@@ -1,4 +1,5 @@
 using Application.Service.DI;
+using Application.Service.Extensions;
 
 namespace Application.Service
 {
@@ -14,6 +15,7 @@ namespace Application.Service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.Configure();
 
             builder.Services.AddApiDependencies(builder.Configuration);
             var app = builder.Build();

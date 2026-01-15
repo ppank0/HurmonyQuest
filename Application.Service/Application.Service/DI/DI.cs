@@ -1,4 +1,5 @@
-﻿using Application.Service.HttpClients;
+﻿using Application.Service.Extensions;
+using Application.Service.HttpClients;
 using Application.Service.Mapper;
 using Application.Service.Options;
 using ApplicationService.BLL.DI;
@@ -34,6 +35,8 @@ namespace Application.Service.DI
                 if (!string.IsNullOrWhiteSpace(opt.ApiKey))
                     http.DefaultRequestHeaders.Add("X-Api-Key", opt.ApiKey);
             });
+
+            services.AddCustomAuth(configuration);
 
             return services;
         }

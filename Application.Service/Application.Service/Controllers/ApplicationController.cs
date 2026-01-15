@@ -3,20 +3,23 @@ using ApplicationService.BLL.Interfaces;
 using ApplicationService.BLL.Models.Requests;
 using ApplicationService.DAL.Enum;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ApplicationController(IMapper mapper, IVideoService videoService, IApplicationService applicationService) : ControllerBase
     {
         [HttpPost]
+        [Authorize(Policy = "CreateApplication")]
         public async Task<ApplicationDto> CreateAsync(CreateApplicationApiRequest request, CancellationToken ct)
         {
             await using var stream = request.File.OpenReadStream();
             var videoModel = await videoService.PutAsync(request.File.FileName, request.File.ContentType, stream, ct);
-            var createApp = mapper.Map<CreateApplicationRequest>(request) with { VideoId = videoModel.Id};
+            var createApp = mapper.Map<CreateApplicationRequest>(request) with { VideoId = videoModel.Id };
             var newApp = await applicationService.CreateAsync(createApp, ct);
 
             return mapper.Map<ApplicationDto>(newApp);
@@ -29,6 +32,7 @@ namespace Application.Service.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "ReadApplication")]
         public async Task<ApplicationDto> GetById(Guid id, CancellationToken ct)
         {
             return mapper.Map<ApplicationDto>(await applicationService.GetByIdAsync(id, ct));
