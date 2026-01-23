@@ -10,7 +10,7 @@ namespace Application.Service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ApplicationController(IMapper mapper, IVideoService videoService, IApplicationService applicationService) : ControllerBase
     {
         [HttpPost]
@@ -32,7 +32,7 @@ namespace Application.Service.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "ReadApplication")]
+        //[Authorize(Policy = "ReadApplication")]
         public async Task<ApplicationDto> GetById(Guid id, CancellationToken ct)
         {
             return mapper.Map<ApplicationDto>(await applicationService.GetByIdAsync(id, ct));

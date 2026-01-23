@@ -1,5 +1,7 @@
-﻿using ApplicationService.BLL.Interfaces;
+﻿using ApplicationService.Bll.Integrations.Infractructure;
+using ApplicationService.BLL.Interfaces;
 using ApplicationService.BLL.Mapper;
+using ApplicationService.BLL.Repositories.Interfaces;
 using ApplicationService.BLL.Services;
 using ApplicationService.DAL.DI;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +23,8 @@ namespace ApplicationService.BLL.DI
             services.AddScoped<IVideoService, VideoService>();
             services.AddScoped<IVideoStorage, MinioStorage>();
             services.AddScoped<IApplicationService, AppService>();
+            services.AddScoped<ITokenCache, TokenCache>();
+
 
             MinioOptions = configuration.GetSection("Minio").Get<MinioOptions>();
 
@@ -30,6 +34,12 @@ namespace ApplicationService.BLL.DI
                  .WithCredentials(MinioOptions.AccessKey, MinioOptions.SecretKey)
                  .Build()
             );
+
+            services.AddStackExchangeRedisCache(op =>
+            {
+                op.Configuration = configuration.GetConnectionString("RedisConnection");
+                op.InstanceName = "App_service:";
+            });
 
             return services;
         }
