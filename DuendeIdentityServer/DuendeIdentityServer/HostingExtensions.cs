@@ -1,4 +1,10 @@
 using System.Globalization;
+using Duende.IdentityServer;
+using DuendeIdentityServer.Data;
+using DuendeIdentityServer.Model;
+using DuendeIdentityServer.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Filters;
 
@@ -8,8 +14,6 @@ namespace DuendeIdentityServer
     {
         public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
         {
-            // Set up logging to write regular entries to console, and diagnostics data to a file.
-            // See https://docs.duendesoftware.com/identityserver/diagnostics/data
             builder.Host.UseSerilog((ctx, lc) =>
             {
                 lc.WriteTo.Logger(consoleLogger =>
@@ -42,15 +46,48 @@ namespace DuendeIdentityServer
 
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
         {
-            // uncomment if you want to add a UI
-            //builder.Services.AddRazorPages();
+            builder.Services.AddRazorPages();
+
+            var connectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseNpgsql(
+                    connectionString,
+                    b => b.MigrationsAssembly(typeof(Program).Assembly.FullName)
+                );
+            });
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddIdentityServer()
-                .AddInMemoryIdentityResources(Config.IdentityResources)
-                .AddInMemoryApiScopes(Config.ApiScopes)
-                .AddInMemoryClients(Config.Clients)
-                .AddLicenseSummary();
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = b =>
+                        b.UseNpgsql(connectionString, options => options.MigrationsAssembly(typeof(Program).Assembly.FullName));
+                    options.DefaultSchema = "config";
+                })
+                .AddOperationalStore(options =>
+                {
+                    options.ConfigureDbContext = b =>
+                        b.UseNpgsql(connectionString, options => options.MigrationsAssembly(typeof(Program).Assembly.FullName));
+                    options.DefaultSchema = "ops";
+                })
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddProfileService<ProfileService>();
 
+            builder.Services.AddAuthentication()
+                .AddGitHub(options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+
+                    options.ClientId = builder.Configuration["GitHub:ClientId"]!;
+                    options.ClientSecret = builder.Configuration["GitHub:ClientSecret"]!;
+
+                    options.Scope.Add("user:email");
+                });
             return builder.Build();
         }
 
@@ -63,15 +100,13 @@ namespace DuendeIdentityServer
                 app.UseDeveloperExceptionPage();
             }
 
-            // uncomment if you want to add a UI
-            //app.UseStaticFiles();
-            //app.UseRouting();
+            app.UseStaticFiles();
+            app.UseRouting();
 
             app.UseIdentityServer();
 
-            // uncomment if you want to add a UI
-            //app.UseAuthorization();
-            //app.MapRazorPages().RequireAuthorization();
+            app.UseAuthorization();
+            app.MapRazorPages().RequireAuthorization();
 
             return app;
         }

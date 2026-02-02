@@ -1,8 +1,9 @@
-using System.Globalization;
-using System.Text;
 using Duende.IdentityServer.Licensing;
 using DuendeIdentityServer;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
+using System.Globalization;
+using System.Text;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -21,6 +22,10 @@ try
 
     if (app.Environment.IsDevelopment())
     {
+        using (var scope = app.Services.CreateScope()) { 
+            await DataSeed.SeedData(scope.ServiceProvider);
+        }
+
         app.Lifetime.ApplicationStopping.Register(() =>
         {
             var usage = app.Services.GetRequiredService<LicenseUsageSummary>();
