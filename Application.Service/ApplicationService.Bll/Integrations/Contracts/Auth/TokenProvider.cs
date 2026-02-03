@@ -12,7 +12,7 @@ namespace ApplicationService.BLL.Integrations.Contracts.Auth
             var scopes = configuration[$"DuendeIdentityServer:Downstream:{downstream}:Scopes"];
             var key = BuildKey(downstream, scopes!);
             var token = await cache.GetTokenAsync(key, ct);
-            if (token != null)
+            if (token is not null)
             {
                 return token;
             }

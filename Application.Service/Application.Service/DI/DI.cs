@@ -21,12 +21,8 @@ namespace Application.Service.DI
             services.AddBLLDependencies(configuration);
             services.Configure<ParticipantsOptions>(configuration.GetSection("Participants"));
             services.Configure<InstrumentsOptions>(configuration.GetSection("Instruments"));
+            services.Configure<DuendeOptions>(configuration.GetSection("DuendeIdentityServer"));
             services.AddScoped<ITokenProvider, TokenProvider>();
-
-            //services.AddTransient<AuthTokenHandler>(sp =>
-            //    new AuthTokenHandler(sp.GetRequiredService<ITokenProvider>(), "Participant"));
-            //services.AddTransient<AuthTokenHandler>(sp =>
-            //    new AuthTokenHandler(sp.GetRequiredService<ITokenProvider>(), "Instrument"));
 
             services.AddHttpClient<IParticipantHttpClient, ParticipantHttpClient>((sp, http) =>
             {
@@ -48,13 +44,16 @@ namespace Application.Service.DI
             }).AddHttpMessageHandler(sp => 
                 new AuthTokenHandler(sp.GetRequiredService<ITokenProvider>(), "Instrument"));
 
+            var serviceProvider = services.BuildServiceProvider();
+            var duendeOptions = serviceProvider.GetRequiredService<IOptions<DuendeOptions>>();
+
             services.AddHttpClient<IDuendeHttpClient, DuendeHttpClient>((sp, http) =>
             {
-                http.BaseAddress = new Uri(configuration["DuendeIdentityServer:BaseUrl"]);
+                http.BaseAddress = new Uri(duendeOptions.Value.BaseUrl);
                 http.Timeout = TimeSpan.FromMinutes(2);
             });
 
-            services.AddCustomAuth(configuration);
+            services.AddCustomAuth(duendeOptions);
 
             return services;
         }

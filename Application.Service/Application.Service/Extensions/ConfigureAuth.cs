@@ -1,29 +1,59 @@
-﻿namespace Application.Service.Extensions
+﻿using Application.Service.Options;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+
+namespace Application.Service.Extensions
 {
     public static class ConfigureAuth
     {
-        public static void AddCustomAuth(this IServiceCollection services, IConfiguration configuration)
+        public static void AddCustomAuth(this IServiceCollection services, IOptions<DuendeOptions> duendeOptions)
         {
-            services.AddAuthentication("Bearer")
-                .AddJwtBearer(options =>
+            services.AddAuthentication()
+                .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = $"{configuration["DuendeIdentityServer:BaseUrl"]}";
-                    options.TokenValidationParameters.ValidateAudience = false;
-                }
-            );
+                    options.Authority = duendeOptions.Value.BaseUrl;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateAudience = false, // Validate 
+                        RoleClaimType = "role",
+                    };
+                    options.MapInboundClaims = false;
+                });
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("ReadApplication", policy =>
+                bool IsRole(AuthorizationHandlerContext ctx, string role)
                 {
-                    policy.RequireAssertion(ctx => ctx.User.HasClaim(c =>
-                        c.Type == "scope" && c.Value == "application.read"));
-                });
-                options.AddPolicy("CreateApplication", policy =>
+                    return ctx.User.IsInRole(role) || ctx.User.HasClaim("role", role);
+                }
+
+                bool HasScope(AuthorizationHandlerContext ctx, string scope)
                 {
-                    policy.RequireAssertion(ctx => ctx.User.HasClaim(c =>
-                        c.Type == "scope" && c.Value == "application.create"));
-                });
+                     return ctx.User.Claims.Where(s => s.Type == "scope")
+                            .SelectMany(v => v.Value.Split(" ", StringSplitOptions.RemoveEmptyEntries))
+                            .Contains(scope);
+                }
+
+                options.AddPolicy("ReadApplications", policy => policy.RequireAssertion(ctx =>
+                    (IsRole(ctx, "admin") || IsRole(ctx, "jury")) && HasScope(ctx, "application.read")
+                ));
+
+                options.AddPolicy("ReadApplicationById", policy => policy.RequireAssertion(ctx =>
+                    (IsRole(ctx, "admin") || IsRole(ctx, "jury") || IsRole(ctx, "participant")) && HasScope(ctx, "application.readById")
+                ));
+
+                options.AddPolicy("DeleteApplication", policy => policy.RequireAssertion(ctx =>
+                    IsRole(ctx, "admin") && HasScope(ctx, "application.delete")
+                ));
+
+                options.AddPolicy("UpdateApplication", policy => policy.RequireAssertion(ctx =>
+                    (IsRole(ctx, "admin") || IsRole(ctx, "jury")) && HasScope(ctx, "application.update")
+                ));
+
+                options.AddPolicy("CreateApplication", policy => policy.RequireAssertion(ctx =>
+                    (IsRole(ctx, "admin") || IsRole(ctx, "participant")) && HasScope(ctx, "application.create")
+                ));
             });
         }
     }

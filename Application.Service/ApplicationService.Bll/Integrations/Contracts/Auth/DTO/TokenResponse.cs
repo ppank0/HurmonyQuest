@@ -12,6 +12,5 @@ namespace ApplicationService.BLL.Integrations.Contracts.Auth.DTO
 
         [JsonPropertyName("scope")]
         public string Scope { get; init; } = default!;
-
     }
 }

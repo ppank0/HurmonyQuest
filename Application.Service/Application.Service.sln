@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationService.DAL", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationService.BLL", "ApplicationService.Bll\ApplicationService.BLL.csproj", "{645CFF34-7917-4956-84CC-04AFAA9B1551}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuendeIdentityServer", "..\DuendeIdentityServer\DuendeIdentityServer\DuendeIdentityServer.csproj", "{331DA6A9-F266-4D8C-254D-04D64D1F1A9C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{645CFF34-7917-4956-84CC-04AFAA9B1551}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{645CFF34-7917-4956-84CC-04AFAA9B1551}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{645CFF34-7917-4956-84CC-04AFAA9B1551}.Release|Any CPU.Build.0 = Release|Any CPU
-		{331DA6A9-F266-4D8C-254D-04D64D1F1A9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{331DA6A9-F266-4D8C-254D-04D64D1F1A9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{331DA6A9-F266-4D8C-254D-04D64D1F1A9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{331DA6A9-F266-4D8C-254D-04D64D1F1A9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

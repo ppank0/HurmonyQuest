@@ -1,4 +1,5 @@
 ﻿using Application.Service.Dtos;
+using ApplicationService.BLL.Consts;
 using ApplicationService.BLL.Interfaces;
 using ApplicationService.BLL.Models.Requests;
 using ApplicationService.DAL.Enum;
@@ -10,11 +11,11 @@ namespace Application.Service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ApplicationController(IMapper mapper, IVideoService videoService, IApplicationService applicationService) : ControllerBase
     {
         [HttpPost]
-        [Authorize(Policy = "CreateApplication")]
+        [Authorize(Policy = AuthPolicies.CreateApplication)]
         public async Task<ApplicationDto> CreateAsync(CreateApplicationApiRequest request, CancellationToken ct)
         {
             await using var stream = request.File.OpenReadStream();
@@ -26,19 +27,21 @@ namespace Application.Service.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = AuthPolicies.DeleteApplication)]
         public async Task DeleteAsync(Guid id, CancellationToken ct)
         {
             await applicationService.DeleteAsync(id, ct);
         }
 
         [HttpGet("{id}")]
-        //[Authorize(Policy = "ReadApplication")]
+        [Authorize(Policy = AuthPolicies.ReadApplicationById)]
         public async Task<ApplicationDto> GetById(Guid id, CancellationToken ct)
         {
             return mapper.Map<ApplicationDto>(await applicationService.GetByIdAsync(id, ct));
         }
 
         [HttpPatch("{id}")]
+        [Authorize(Policy = AuthPolicies.UpdateApplication)]
         public async Task<ApplicationDto> UpdateStatusAsync(Guid id, [FromBody] ApplicationStatus status, CancellationToken ct)
         {
             return mapper.Map<ApplicationDto>(await applicationService.UpdateAsync(
@@ -46,6 +49,7 @@ namespace Application.Service.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = AuthPolicies.ReadApplications)]
         public async Task<List<ApplicationDto>> GetAll(CancellationToken ct)
         {
             return mapper.Map<List<ApplicationDto>>(await applicationService.GetAllAsync(ct));
