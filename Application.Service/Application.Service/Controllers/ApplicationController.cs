@@ -34,7 +34,7 @@ namespace Application.Service.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = AuthPolicies.ReadApplicationById)]
+        [Authorize(Policy = AuthPolicies.ReadApplications)]
         public async Task<ApplicationDto> GetById(Guid id, CancellationToken ct)
         {
             return mapper.Map<ApplicationDto>(await applicationService.GetByIdAsync(id, ct));

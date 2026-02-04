@@ -79,8 +79,8 @@ namespace ApplicationService.BLL.Services
                 throw new NotFoundException($"Application with id: {id} was not found");
             }
 
-            var instrument = await instrumentClient.GetByIdAsync(application.InstrumentId, ct);
             var participant = await participantClient.GetAsync(application.ParticipantId, ct);
+            var instrument = await instrumentClient.GetByIdAsync(application.InstrumentId, ct);
 
             return new ApplicationModel
             {

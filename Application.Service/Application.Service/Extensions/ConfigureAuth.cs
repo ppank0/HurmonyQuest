@@ -36,11 +36,7 @@ namespace Application.Service.Extensions
                 }
 
                 options.AddPolicy("ReadApplications", policy => policy.RequireAssertion(ctx =>
-                    (IsRole(ctx, "admin") || IsRole(ctx, "jury")) && HasScope(ctx, "application.read")
-                ));
-
-                options.AddPolicy("ReadApplicationById", policy => policy.RequireAssertion(ctx =>
-                    (IsRole(ctx, "admin") || IsRole(ctx, "jury") || IsRole(ctx, "participant")) && HasScope(ctx, "application.readById")
+                    (IsRole(ctx, "admin") || IsRole(ctx, "jury") || IsRole(ctx, "participant")) && HasScope(ctx, "application.read")
                 ));
 
                 options.AddPolicy("DeleteApplication", policy => policy.RequireAssertion(ctx =>

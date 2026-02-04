@@ -25,7 +25,6 @@ namespace DuendeIdentityServer
             new ApiScope[]
                 {
                     new ApiScope("application.read", "read application data"),
-                    new ApiScope("application.readById", "read application by Id"),
                     new ApiScope("application.create", "create application"),
                     new ApiScope("application.delete", "delete application"),
                     new ApiScope("application.edit", "edit application"),
@@ -79,7 +78,6 @@ namespace DuendeIdentityServer
                             "application.create",
                             "application.delete",
                             "application.edit",
-                            "application.readById",
                             "roles"
                         }
                     }

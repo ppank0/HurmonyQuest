@@ -1,5 +1,4 @@
 using Application.Service.DI;
-using Application.Service.Extensions;
 
 namespace Application.Service
 {
