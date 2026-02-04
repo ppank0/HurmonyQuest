@@ -4,7 +4,7 @@ namespace ApplicationService.BLL.Interfaces
 {
     public interface IVideoService
     {
-        Task<(Stream, string)> GetAsync(string videoUrl, CancellationToken ct);
+        Task<FileContentResultModel> GetAsync(string videoUrl, CancellationToken ct);
 
         Task<VideoModel> PutAsync(string objName, string contentType, Stream data, CancellationToken ct);
 

@@ -4,14 +4,8 @@ using ApplicationService.BLL.Integrations.Contracts.Instruments.DTOs;
 
 namespace Application.Service.HttpClients
 {
-    public class InstrumentHttpClient(HttpClient httpClient) : IInstrumentHttpClient
+    public class InstrumentHttpClient(HttpClient _httpClient) : IInstrumentHttpClient
     {
-        private readonly HttpClient _httpClient = httpClient;
-        public Task<List<InstrumentResponse>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<InstrumentResponse> GetByIdAsync(Guid id, CancellationToken ct)
         {
             var res = await _httpClient.GetAsync($"/api/instruments/{id}", ct);

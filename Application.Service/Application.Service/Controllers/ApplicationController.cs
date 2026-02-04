@@ -12,14 +12,13 @@ namespace Application.Service.Controllers
     public class ApplicationController(IMapper mapper, IVideoService videoService, IApplicationService applicationService) : ControllerBase
     {
         [HttpPost]
-        public async Task<ApplicationDto> CreateAsync(string name, string surname, DateOnly birthday,
-            Guid musicalInstrumentId, Guid nominationId, IFormFile file, CancellationToken ct)
+        public async Task<ApplicationDto> CreateAsync(CreateApplicationApiRequest request, CancellationToken ct)
         {
-            await using var stream = file.OpenReadStream();
-            var videoModel = await videoService.PutAsync(file.FileName, file.ContentType, stream, ct);
+            await using var stream = request.File.OpenReadStream();
+            var videoModel = await videoService.PutAsync(request.File.FileName, request.File.ContentType, stream, ct);
+            var createApp = mapper.Map<CreateApplicationRequest>(request) with { VideoId = videoModel.Id};
+            var newApp = await applicationService.CreateAsync(createApp, ct);
 
-            var newApp = await applicationService.CreateAsync(new CreateApplicationRequest(name, surname, birthday, musicalInstrumentId,
-                                    nominationId, videoModel.Id), ct);
             return mapper.Map<ApplicationDto>(newApp);
         }
 
@@ -36,7 +35,7 @@ namespace Application.Service.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ApplicationDto> UpdateStatusAsync(Guid id, ApplicationStatus status, CancellationToken ct)
+        public async Task<ApplicationDto> UpdateStatusAsync(Guid id, [FromBody] ApplicationStatus status, CancellationToken ct)
         {
             return mapper.Map<ApplicationDto>(await applicationService.UpdateAsync(
                 new UpdateApplicationRequest(id, status), ct));

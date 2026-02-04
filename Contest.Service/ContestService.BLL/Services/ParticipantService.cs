@@ -6,7 +6,7 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
 namespace ContestService.BLL.Services;
-public class ParticipantService(IRepositoryBase<Participant> repository,
+public class ParticipantService(IParticipantRepository repository,
                                     INominationRepository nominationRepository, IMapper mapper) : IParticipantService
 {
     public async Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct)
@@ -39,7 +39,7 @@ public class ParticipantService(IRepositoryBase<Participant> repository,
 
     public async Task<List<ParticipantModel>> GetAllAsync(CancellationToken ct)
     {
-        var participantList = await repository.GetAllToListAsync(ct);
+        var participantList = await repository.GetAllWithRelationsAsync(ct);
 
         return mapper.Map<List<ParticipantModel>>(participantList);
     }
