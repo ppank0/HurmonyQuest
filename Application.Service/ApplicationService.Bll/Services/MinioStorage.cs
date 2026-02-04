@@ -1,9 +1,14 @@
 ﻿using ApplicationService.BLL.Interfaces;
+<<<<<<< feature/9-create-integration-tests
+using Minio;
+using Minio.DataModel.Args;
+=======
 using ApplicationService.BLL.Models;
 using Minio;
 using Minio.DataModel.Args;
 using Npgsql.Internal;
 using System.IO;
+>>>>>>> main
 
 namespace ApplicationService.BLL.Services
 {
@@ -23,7 +28,11 @@ namespace ApplicationService.BLL.Services
             if (!isExist) await _minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName), ct);
         }
 
+<<<<<<< feature/9-create-integration-tests
+        public async Task<(Stream, string)> GetObjectAsync(string bucket, string objName, CancellationToken ct)
+=======
         public async Task<FileContentResultModel> GetObjectAsync(string bucket, string objName, CancellationToken ct)
+>>>>>>> main
         {
             var ms = new MemoryStream();
 
@@ -31,9 +40,14 @@ namespace ApplicationService.BLL.Services
                 .WithBucket(bucket)
                 .WithObject(objName)
                 .WithCallbackStream(stream => stream.CopyTo(ms)), ct);
+<<<<<<< feature/9-create-integration-tests
+
+            return (ms, file.ContentType);
+=======
             ms.Flush();
             ms.Position = 0;
             return new FileContentResultModel(ms, file.ContentType, objName);
+>>>>>>> main
         }
 
         public async Task PutObjectAsync(string bucket, string objName, string contentType, Stream data, CancellationToken ct)

@@ -1,3 +1,7 @@
+<<<<<<< feature/9-create-integration-tests
+
+=======
+>>>>>>> main
 using Application.Service.DI;
 
 namespace Application.Service
@@ -28,6 +32,11 @@ namespace Application.Service
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+<<<<<<< feature/9-create-integration-tests
+
+
+=======
+>>>>>>> main
             app.MapControllers();
 
             app.Run();

@@ -10,8 +10,13 @@ namespace Application.Service.Controllers
         [HttpGet]
         public async Task<IActionResult> GetObjectAsync(string name, CancellationToken ct)
         {
+<<<<<<< feature/9-create-integration-tests
+            var (stream, contentType) = await videoService.GetAsync(name, ct);
+            return File(stream, contentType);
+=======
             var file = await videoService.GetAsync(name, ct);
             return File(file.Stream, file.ContentType);
+>>>>>>> main
         }
 
         [HttpPost]
