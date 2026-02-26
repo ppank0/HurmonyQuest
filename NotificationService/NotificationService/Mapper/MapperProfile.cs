@@ -11,14 +11,8 @@ namespace NotificationService.Mapper
         public MapperProfile()
         {
             CreateMap<NotificationEntity, NotificationModel>().ReverseMap();
-            CreateMap<NotificationDto, NotificationModel>();
-                //.ForMember(d => d.UserId, u => u.MapFrom(i => ObjectId.Parse(i.UserId)));
-            CreateMap<NotificationModel, NotificationDto>();
-                //.ForMember(d => d.UserId, u => u.MapFrom(i => i.UserId.ToString()));
-
+            CreateMap<NotificationDto, NotificationModel>().ReverseMap();
             CreateMap<EditNotificationDto, EditNotificationModel>().ReverseMap();
-
-
         }
     }
 }

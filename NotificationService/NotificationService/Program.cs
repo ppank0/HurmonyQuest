@@ -1,5 +1,4 @@
 using NotificationService.DI;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace NotificationService
 {

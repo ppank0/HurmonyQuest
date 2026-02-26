@@ -10,7 +10,6 @@ namespace NotificationService.Data.Models
         public string Message { get; set; } = null!;
 
         public NotificationStatus Status { get; set; }
-        public bool IsRead { get; set; }
 
         public TargetType TargetType { get; set; }
         public string? UserId { get; set; }

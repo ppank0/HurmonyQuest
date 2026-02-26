@@ -10,7 +10,8 @@ namespace Application.Service.Mapper
         public MapperProfile()
         {
             CreateMap<ApplicationDto, ApplicationModel>().ReverseMap();
-            CreateMap<CreateApplicationApiRequest, CreateApplicationRequest>();
+            CreateMap<CreateApplicationApiRequest, CreateApplicationRequest>()
+                .ForCtorParam("VideoId", opt => opt.MapFrom(src => Guid.Empty));
         }
     }
 }
