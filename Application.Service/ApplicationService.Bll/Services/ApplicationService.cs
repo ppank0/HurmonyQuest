@@ -1,5 +1,6 @@
 ﻿using ApplicationService.BLL.Exeptions;
 using ApplicationService.BLL.Integrations.Contracts.Instruments;
+using ApplicationService.BLL.Integrations.Contracts.Instruments.DTOs;
 using ApplicationService.BLL.Integrations.Contracts.Participant;
 using ApplicationService.BLL.Integrations.Contracts.Participants.DTOs;
 using ApplicationService.BLL.Interfaces;
@@ -9,12 +10,15 @@ using ApplicationService.DAL.Entities;
 using ApplicationService.DAL.Enum;
 using ApplicationService.DAL.UnitOfWork;
 using AutoMapper;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using SharedModels.Application;
 
 namespace ApplicationService.BLL.Services
 {
     public class ApplicationService(IMapper mapper, IUnitOfWork unitOfWork,
-        IParticipantHttpClient participantClient, IInstrumentHttpClient instrumentClient, IVideoService videoService) : IApplicationService
+        IParticipantHttpClient participantClient, IInstrumentHttpClient instrumentClient, IVideoService videoService,
+        IPublishEndpoint publishEndpoint) : IApplicationService
     {
         public async Task<ApplicationModel> CreateAsync(CreateApplicationRequest request, CancellationToken ct)
         {
@@ -32,6 +36,13 @@ namespace ApplicationService.BLL.Services
 
             await unitOfWork.Applications.CreateAsync(appEntity, ct);
             await unitOfWork.SaveAsync(ct);
+            await publishEndpoint.Publish<IApplication>(new
+            {
+                UserId = participant.Id,
+                ActionToApplication = ActionType.Create,
+                ApplicationData = new ApplicationData(participant.Name, participant.Surname,
+                    ApplicationStatus.RendingReview.ToString(), instrument.Name),
+            }, ct);
 
             return new ApplicationModel()
             {
@@ -57,6 +68,12 @@ namespace ApplicationService.BLL.Services
             await videoService.DeleteAsync(application.VideoId, ct);
 
             await unitOfWork.SaveAsync(ct);
+
+            await publishEndpoint.Publish<IApplication>(new
+            {
+                UserId = application.ParticipantId,
+                ActionToApplication = ActionType.Delete
+            }, ct);
         }
 
         public async Task<List<ApplicationModel>> GetAllAsync(CancellationToken ct)
@@ -81,7 +98,7 @@ namespace ApplicationService.BLL.Services
 
             var instrument = await instrumentClient.GetByIdAsync(application.InstrumentId, ct);
             var participant = await participantClient.GetAsync(application.ParticipantId, ct);
-
+            
             return new ApplicationModel
             {
                 Id = id,
@@ -104,7 +121,18 @@ namespace ApplicationService.BLL.Services
             await unitOfWork.Applications.UpdateAsync(application, ct);
             await unitOfWork.SaveAsync(ct);
 
-            return await GetByIdAsync(request.id, ct);
+            var updatedApplication = await GetByIdAsync(request.id, ct);
+
+            await publishEndpoint.Publish<IApplication>(new
+            {
+                UserId = updatedApplication.Id,
+                ActionToApplication = ActionType.Update,
+                ApplicationData = new ApplicationData(updatedApplication.ParticipantName,
+                    updatedApplication.ParticipantSurname, request.status.ToString(),
+                    updatedApplication.NominationName),
+            }, ct);
+
+            return updatedApplication;
         }
     }
 }

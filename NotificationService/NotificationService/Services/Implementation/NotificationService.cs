@@ -64,8 +64,7 @@ namespace NotificationService.Services.Implementation
 
             var toUpdate = Builders<NotificationEntity>.Update.Combine(
                 Builders<NotificationEntity>.Update.Set(x => x.Title, editNotification.Title),
-                Builders<NotificationEntity>.Update.Set(x => x.Message, editNotification.Message),
-                Builders<NotificationEntity>.Update.Set(x => x.IsRead, editNotification.IsRead));
+                Builders<NotificationEntity>.Update.Set(x => x.Message, editNotification.Message));
 
             var options = new FindOneAndUpdateOptions<NotificationEntity>
             {
