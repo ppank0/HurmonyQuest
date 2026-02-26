@@ -11,7 +11,7 @@ namespace Application.Service.Mapper
         {
             CreateMap<ApplicationDto, ApplicationModel>().ReverseMap();
             CreateMap<CreateApplicationApiRequest, CreateApplicationRequest>()
-                .ForCtorParam("VideoId", opt => opt.MapFrom(src => Guid.Empty));
+                .ForCtorParam(nameof(CreateApplicationRequest.VideoId), opt => opt.MapFrom(src => Guid.Empty));
         }
     }
 }

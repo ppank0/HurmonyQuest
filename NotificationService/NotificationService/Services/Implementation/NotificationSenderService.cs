@@ -6,7 +6,7 @@ namespace NotificationService.Services.Implementation
 {
     public class NotificationSenderService() : INotificationSenderService
     {
-        private void FindoutTargetType(NotificationModel notification, CancellationToken ct)
+        private static void SetTargetType(NotificationModel notification, CancellationToken ct)
         {
             if (notification.UserId is not null && notification.TargetGroup is null)
             {
@@ -18,13 +18,13 @@ namespace NotificationService.Services.Implementation
             }
             else
             {
-                throw new Exception("There cannot be just one type of target, or both at the same time.");
+                throw new InvalidOperationException("Notification must have exactly one target (User or Group).");
             }
         }
 
         public async Task SendNotification(NotificationModel notification, CancellationToken ct)
         {
-            FindoutTargetType(notification, ct);
+            SetTargetType(notification, ct);
 
             switch (notification.TargetType)
             {

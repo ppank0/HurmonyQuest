@@ -2,13 +2,14 @@
 using NotificationService.Data.Models;
 using NotificationService.Extensions.Exceptions;
 using NotificationService.Services.Interfaces;
-using SharedModels.Application;
+using SharedModels.Contracts.Applications;
+using SharedModels.Contracts.Applications.Data;
 
 namespace NotificationService.Services.Consumers
 {
-    public class ApplicationConsumer(INotificationService notificationService) : IConsumer<IApplication>
+    public class ApplicationConsumer(INotificationService notificationService) : IConsumer<IApplicationEvent>
     {
-        public async Task Consume(ConsumeContext<IApplication> context)
+        public async Task Consume(ConsumeContext<IApplicationEvent> context)
         {
             await (context.Message.ActionToApplication switch
             {
@@ -20,7 +21,7 @@ namespace NotificationService.Services.Consumers
             });
         }
 
-        public async Task ConsumeApplicationCreated(ConsumeContext<IApplication> context)
+        public async Task ConsumeApplicationCreated(ConsumeContext<IApplicationEvent> context)
         {
             var notificationModel = new NotificationModel
             {
@@ -35,7 +36,7 @@ namespace NotificationService.Services.Consumers
             await notificationService.CreateAsync(notificationModel, context.CancellationToken);
         }
 
-        public async Task ConsumeApplicationStatusUpdated(ConsumeContext<IApplication> context)
+        public async Task ConsumeApplicationStatusUpdated(ConsumeContext<IApplicationEvent> context)
         {
             var notificationModel = new NotificationModel
             {
@@ -48,7 +49,7 @@ namespace NotificationService.Services.Consumers
 
             await notificationService.CreateAsync(notificationModel, context.CancellationToken);
         }
-        public async Task ConsumeApplicationDeleted(ConsumeContext<IApplication> context)
+        public async Task ConsumeApplicationDeleted(ConsumeContext<IApplicationEvent> context)
         {
             var notificationModel = new NotificationModel
             {

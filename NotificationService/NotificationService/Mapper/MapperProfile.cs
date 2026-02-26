@@ -12,7 +12,6 @@ namespace NotificationService.Mapper
         {
             CreateMap<NotificationEntity, NotificationModel>().ReverseMap();
             CreateMap<NotificationDto, NotificationModel>().ReverseMap();
-            CreateMap<EditNotificationDto, EditNotificationModel>().ReverseMap();
         }
     }
 }

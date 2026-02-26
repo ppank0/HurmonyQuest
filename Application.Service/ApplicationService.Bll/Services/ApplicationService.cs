@@ -1,6 +1,5 @@
 ﻿using ApplicationService.BLL.Exeptions;
 using ApplicationService.BLL.Integrations.Contracts.Instruments;
-using ApplicationService.BLL.Integrations.Contracts.Instruments.DTOs;
 using ApplicationService.BLL.Integrations.Contracts.Participant;
 using ApplicationService.BLL.Integrations.Contracts.Participants.DTOs;
 using ApplicationService.BLL.Interfaces;
@@ -12,7 +11,8 @@ using ApplicationService.DAL.UnitOfWork;
 using AutoMapper;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
-using SharedModels.Application;
+using SharedModels.Contracts.Applications;
+using SharedModels.Contracts.Applications.Data;
 
 namespace ApplicationService.BLL.Services
 {
@@ -36,7 +36,7 @@ namespace ApplicationService.BLL.Services
 
             await unitOfWork.Applications.CreateAsync(appEntity, ct);
             await unitOfWork.SaveAsync(ct);
-            await publishEndpoint.Publish<IApplication>(new
+            await publishEndpoint.Publish<IApplicationEvent>(new
             {
                 UserId = participant.Id,
                 ActionToApplication = ActionType.Create,
@@ -69,7 +69,7 @@ namespace ApplicationService.BLL.Services
 
             await unitOfWork.SaveAsync(ct);
 
-            await publishEndpoint.Publish<IApplication>(new
+            await publishEndpoint.Publish<IApplicationEvent>(new
             {
                 UserId = application.ParticipantId,
                 ActionToApplication = ActionType.Delete
@@ -98,7 +98,7 @@ namespace ApplicationService.BLL.Services
 
             var instrument = await instrumentClient.GetByIdAsync(application.InstrumentId, ct);
             var participant = await participantClient.GetAsync(application.ParticipantId, ct);
-            
+
             return new ApplicationModel
             {
                 Id = id,
@@ -123,7 +123,7 @@ namespace ApplicationService.BLL.Services
 
             var updatedApplication = await GetByIdAsync(request.id, ct);
 
-            await publishEndpoint.Publish<IApplication>(new
+            await publishEndpoint.Publish<IApplicationEvent>(new
             {
                 UserId = updatedApplication.Id,
                 ActionToApplication = ActionType.Update,

@@ -1,4 +1,4 @@
-﻿namespace SharedModels.Application
+﻿namespace SharedModels.Contracts.Applications.Data
 {
     public enum ActionType
     {

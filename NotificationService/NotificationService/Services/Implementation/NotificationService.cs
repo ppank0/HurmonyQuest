@@ -23,10 +23,6 @@ namespace NotificationService.Services.Implementation
         }
         public async Task CreateAsync(NotificationModel model, CancellationToken ct)
         {
-            if (model is null)
-            {
-                throw new Exception();
-            }
             var entity = _mapper.Map<NotificationEntity>(model);
             await _notifications.InsertOneAsync(entity, cancellationToken: ct);
             await SendAsync(_mapper.Map<NotificationModel>(entity), ct);
@@ -34,7 +30,7 @@ namespace NotificationService.Services.Implementation
         public async Task SendAsync(NotificationModel model, CancellationToken ct)
         {
             await _notificationSender.SendNotification(model, ct);
-            await UpdateStatus(model.Id, NotificationStatus.Sent, ct);
+            await UpdateStatus(model.Id.ToString(), NotificationStatus.Sent, ct);
         }
 
         public async Task<List<NotificationModel>> GetAll(CancellationToken ct)
@@ -44,9 +40,9 @@ namespace NotificationService.Services.Implementation
 
             return _mapper.Map<List<NotificationModel>>(entityList);
         }
-        public async Task UpdateStatus(ObjectId id, NotificationStatus newStatus, CancellationToken ct)
+        public async Task UpdateStatus(string id, NotificationStatus newStatus, CancellationToken ct)
         {
-            var filter = Builders<NotificationEntity>.Filter.Eq(x => x.Id, id);
+            var filter = Builders<NotificationEntity>.Filter.Eq(x => x.Id, ObjectId.Parse(id));
             var update = Builders<NotificationEntity>.Update.Set(x => x.Status, newStatus);
 
             await _notifications.UpdateOneAsync(filter, update, cancellationToken: ct);
@@ -56,25 +52,6 @@ namespace NotificationService.Services.Implementation
         {
             var filter = Builders<NotificationEntity>.Filter.Eq(x => x.Id, ObjectId.Parse(id));
             await _notifications.DeleteOneAsync(filter, cancellationToken: ct);
-        }
-
-        public async Task<NotificationModel> UpdateAsync(string id, EditNotificationModel editNotification, CancellationToken ct)
-        {
-            var filter = Builders<NotificationEntity>.Filter.Eq(x => x.Id, ObjectId.Parse(id));
-
-            var toUpdate = Builders<NotificationEntity>.Update.Combine(
-                Builders<NotificationEntity>.Update.Set(x => x.Title, editNotification.Title),
-                Builders<NotificationEntity>.Update.Set(x => x.Message, editNotification.Message));
-
-            var options = new FindOneAndUpdateOptions<NotificationEntity>
-            {
-                ReturnDocument = ReturnDocument.After
-            };
-
-            var updatedEntity = await _notifications.FindOneAndUpdateAsync(filter, toUpdate,
-                                                                options, cancellationToken: ct);
-
-            return _mapper.Map<NotificationModel>(updatedEntity);
         }
     }
 }
