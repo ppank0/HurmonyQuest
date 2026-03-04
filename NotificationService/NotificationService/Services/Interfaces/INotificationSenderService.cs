@@ -4,6 +4,6 @@ namespace NotificationService.Services.Interfaces
 {
     public interface INotificationSenderService
     {
-        Task SendNotification(NotificationModel notification, CancellationToken ct);
+        Task<bool> SendNotification(NotificationModel notification, CancellationToken ct);
     }
 }

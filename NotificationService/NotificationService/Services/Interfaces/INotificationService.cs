@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using NotificationService.Data.Enums;
 using NotificationService.Data.Models;
 
@@ -10,5 +11,6 @@ namespace NotificationService.Services.Interfaces
         Task DeleteAsync(string id, CancellationToken ct);
         Task<List<NotificationModel>> GetAll(CancellationToken ct);
         Task UpdateStatus(string id, NotificationStatus newStatus, CancellationToken ct);
+        Task SendAsync(NotificationModel model, CancellationToken ct);
     }
 }

@@ -6,8 +6,9 @@ namespace NotificationService.Data.Models
     public class NotificationModel
     {
         public ObjectId Id { get; set; }
-        public string Title { get; set; } = null!;
-        public string Message { get; set; } = null!;
+        public required string Title { get; set; }
+        public required string Message { get; set; }
+        public string? MessageId {  get; set; }
 
         public NotificationStatus Status { get; set; }
 

@@ -21,16 +21,36 @@ namespace NotificationService.Services.Implementation
             _mapper = mapper;
             _notificationSender = notificationSender;
         }
+        private async Task<bool> IsAlreadyExist(NotificationEntity entity, CancellationToken ct)
+        {
+            var existing = await _notifications
+                .Find(n => n.MessageId == entity.MessageId).FirstOrDefaultAsync(ct);
+
+            return existing is not null;
+        }
         public async Task CreateAsync(NotificationModel model, CancellationToken ct)
         {
             var entity = _mapper.Map<NotificationEntity>(model);
-            await _notifications.InsertOneAsync(entity, cancellationToken: ct);
-            await SendAsync(_mapper.Map<NotificationModel>(entity), ct);
+
+            if (await IsAlreadyExist(entity, ct)) return;
+
+            try
+            {
+                await _notifications.InsertOneAsync(entity, cancellationToken: ct);
+                await SendAsync(_mapper.Map<NotificationModel>(entity), ct);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         public async Task SendAsync(NotificationModel model, CancellationToken ct)
         {
-            await _notificationSender.SendNotification(model, ct);
-            await UpdateStatus(model.Id.ToString(), NotificationStatus.Sent, ct);
+            var isCompletedSuccessfully = await _notificationSender.SendNotification(model, ct);
+            if (isCompletedSuccessfully)
+            {
+                await UpdateStatus(model.Id.ToString(), NotificationStatus.Sent, ct);
+            }
         }
 
         public async Task<List<NotificationModel>> GetAll(CancellationToken ct)

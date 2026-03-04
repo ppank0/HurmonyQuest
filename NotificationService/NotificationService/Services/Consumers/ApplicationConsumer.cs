@@ -29,6 +29,7 @@ namespace NotificationService.Services.Consumers
                 Message = $"{context.Message.applicationData.ParticipantName}, your application was created." +
                 $"\nCurrent status: {context.Message.applicationData.ApplicationStatus}." +
                 $" We'll notify you of any updates.",
+                MessageId = context.MessageId.ToString(),
                 UserId = context.Message.UserId,
                 TargetGroup = context.Message.TargetGroup,
             };
@@ -44,6 +45,7 @@ namespace NotificationService.Services.Consumers
                 Message = $"{context.Message.applicationData.ParticipantName}, your application status was updated." +
                 $"\nCurrent status: {context.Message.applicationData.ApplicationStatus}.",
                 UserId = context.Message.UserId,
+                MessageId = context.MessageId.ToString(),
                 TargetGroup = context.Message.TargetGroup,
             };
 
@@ -56,6 +58,7 @@ namespace NotificationService.Services.Consumers
                 Title = $"Application was deleted",
                 Message = $"Your application was successfully deleted.",
                 UserId = context.Message.UserId,
+                MessageId = context.MessageId.ToString(),
                 TargetGroup = context.Message.TargetGroup,
             };
 

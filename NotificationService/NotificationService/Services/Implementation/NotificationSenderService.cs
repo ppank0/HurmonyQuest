@@ -8,39 +8,43 @@ namespace NotificationService.Services.Implementation
     {
         private static void SetTargetType(NotificationModel notification, CancellationToken ct)
         {
-            if (notification.UserId is not null && notification.TargetGroup is null)
+            notification.TargetType = (notification.UserId, notification.TargetGroup) switch
             {
-                notification.TargetType = TargetType.User;
-            }
-            else if (notification.TargetGroup is not null && notification.UserId is null)
-            {
-                notification.TargetType = TargetType.Group;
-            }
-            else
-            {
-                throw new InvalidOperationException("Notification must have exactly one target (User or Group).");
-            }
+                (not null, null) => TargetType.User,
+                (null, not null) => TargetType.Group,
+                _ => throw new InvalidOperationException("Notification must have exactly one target (User or Group).")
+            };
         }
 
-        public async Task SendNotification(NotificationModel notification, CancellationToken ct)
+        public async Task<bool> SendNotification(NotificationModel notification, CancellationToken ct)
         {
             SetTargetType(notification, ct);
 
-            switch (notification.TargetType)
+            try
             {
-                case TargetType.User:
-                    {
-                        //await hubContext.Clients.User(notification.UserId!)
-                        //    .SendAsync("ReceiveMessage", notification, ct);
-                        break;
-                    }
-                case TargetType.Group:
-                    {
-                        //await hubContext.Clients.Group(notification.TargetGroup!)
-                        //    .SendAsync("ReceiveMessage", notification, ct);
-                        break;
-                    }
+                switch (notification.TargetType)
+                {
+                    case TargetType.User:
+                        {
+                            //var isReceived = await hubContext.Clients.User(notification.UserId!)
+                            //.InvokeAsync<bool>("ReceiveMessage", notification, ct);
+                            var isReceived = true;
+                            return isReceived;
+                        }
+                    case TargetType.Group:
+                        {
+                            //await hubContext.Clients.Group(notification.TargetGroup!)
+                            //    .SendAsync("ReceiveMessage", notification, ct);
+                            break;
+                        }
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+            return false;
         }
     }
 }

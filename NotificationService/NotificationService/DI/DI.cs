@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using MongoDB.Driver;
 using NotificationService.Const;
+using NotificationService.Extensions.BackgroundWorkers;
 using NotificationService.Mapper;
 using NotificationService.Services.Consumers;
 using NotificationService.Services.Implementation;
@@ -16,12 +17,10 @@ namespace NotificationService.DI
             var rabbitmqUsername = configuration.GetRequiredSection("RabbitMq:UserName").Value;
             var rabbitmqPassword = configuration.GetRequiredSection("RabbitMq:Password").Value;
 
-            services.AddScoped<IMongoDatabase>(sp =>
-            {
-                var client = new MongoClient(mongoConnectionString);
-                var db = client.GetDatabase(MongoConst.DatabaseName);
-                return db;
-            });
+            var mongoClient = new MongoClient(mongoConnectionString);
+            services.AddSingleton<IMongoClient>(mongoClient);
+            services.AddSingleton<IMongoDatabase>(sp =>
+                sp.GetRequiredService<IMongoClient>().GetDatabase(MongoConst.DatabaseName));
 
             services.AddAutoMapper(sp =>
             {
@@ -30,6 +29,7 @@ namespace NotificationService.DI
 
             services.AddScoped<INotificationService, Services.Implementation.NotificationService>();
             services.AddScoped<INotificationSenderService, NotificationSenderService>();
+            services.AddHostedService<NotificationOutboxWorker>();
 
             services.AddMassTransit(x =>
             {
@@ -42,9 +42,11 @@ namespace NotificationService.DI
                         host.Username(rabbitmqUsername!);
                         host.Password(rabbitmqPassword!);
                     });
-
+                    
                     cfg.ReceiveEndpoint("ApplicationQueue", e =>
                     {
+                        e.UseMessageRetry(r => r.Exponential(3, TimeSpan.FromSeconds(3),
+                            TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(1)));
                         e.ConfigureConsumer<ApplicationConsumer>(context);
                     });
                 });
