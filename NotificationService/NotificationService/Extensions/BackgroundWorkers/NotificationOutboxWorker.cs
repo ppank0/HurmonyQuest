@@ -8,7 +8,7 @@ using NotificationService.Services.Interfaces;
 
 namespace NotificationService.Extensions.BackgroundWorkers
 {
-    public class NotificationOutboxWorker(IServiceProvider serviceProvider) : BackgroundService
+    public class NotificationOutboxWorker(IServiceProvider serviceProvider, ConnectionMapping<string> connections) : BackgroundService
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -44,9 +44,13 @@ namespace NotificationService.Extensions.BackgroundWorkers
                 {
                     return;
                 }
+                if (connections.Count == 0) return;
 
                 foreach (var notification in unsentData)
                 {
+                    var anyConnections = connections.GetConnections(notification.UserId);
+                    if (anyConnections is null) break;
+
                     if(await CheckAndUpdateRetryInfo(notification, collection, stoppingToken))
                     {
                         await notificationService.SendAsync(mapper.Map<NotificationModel>(notification), stoppingToken);

@@ -1,4 +1,6 @@
 using NotificationService.DI;
+using NotificationService.Services.Hubs;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace NotificationService
 {
@@ -7,6 +9,8 @@ namespace NotificationService
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             // Add services to the container.
             builder.Services.AddDependences(builder.Configuration);
@@ -42,6 +46,7 @@ namespace NotificationService
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<NotificationHub>("notifications");
 
             app.Run();
         }
