@@ -1,7 +1,8 @@
-﻿using ContestService.DAL.Entities;
+﻿using ContestService.DAL.Models;
 
 namespace ContestService.DAL.Repositories.Interfaces;
-public interface IParticipantRepository : IRepositoryBase<Participant>
+
+public interface IParticipantRepository
 {
-    Task<List<Participant>> GetAllWithRelationsAsync(CancellationToken cancellationToken);
+    Task<List<ParticipantExtendedModel>> GetAllWithDetails(CancellationToken ct);
 }
