@@ -6,8 +6,9 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
 namespace ContestService.BLL.Services;
-public class ParticipantService(IParticipantRepository repository,
-                                    INominationRepository nominationRepository, IMapper mapper) : IParticipantService
+public class ParticipantService(IRepositoryBase<Participant> repository, IParticipantRepository participantRepository,
+        INominationRepository nominationRepository, IMusicalInstrumentService instrumentService,
+        IMapper mapper) : IParticipantService
 {
     public async Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct)
     {
@@ -17,9 +18,11 @@ public class ParticipantService(IParticipantRepository repository,
         }
 
         var newParticipant = mapper.Map<Participant>(model);
-        var createdParticipant = await repository.CreateAsync(newParticipant, ct);
+        var createdParticipant = await repository.CreateAsync(newParticipant, ct); 
+        var resultParticipant = mapper.Map<ParticipantModel>(createdParticipant);
+        resultParticipant.NominationId = model.NominationId;
 
-        return mapper.Map<ParticipantModel>(createdParticipant);
+        return resultParticipant;
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
@@ -39,8 +42,7 @@ public class ParticipantService(IParticipantRepository repository,
 
     public async Task<List<ParticipantModel>> GetAllAsync(CancellationToken ct)
     {
-        var participantList = await repository.GetAllWithRelationsAsync(ct);
-
+        var participantList = await participantRepository.GetAllWithDetails(ct);
         return mapper.Map<List<ParticipantModel>>(participantList);
     }
 
@@ -48,13 +50,17 @@ public class ParticipantService(IParticipantRepository repository,
     {
         var participantList = await repository.FindByConditionAsync(p => p.Id == id, ct);
         var participant = participantList.FirstOrDefault();
-
         if (participant is null)
         {
             throw new NotFoundException("entity participant was not found");
         }
+        var additionalInfo = await instrumentService.GetAsync(participant.MusicalInstrumentId, ct);
+        var participantModel = mapper.Map<ParticipantModel>(participant);
 
-        return mapper.Map<ParticipantModel>(participant);
+        participantModel.NominationId = additionalInfo.NominationId;
+        participantModel.NominationName = additionalInfo.NominationName;
+
+        return participantModel;
     }
 
     public async Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct)
