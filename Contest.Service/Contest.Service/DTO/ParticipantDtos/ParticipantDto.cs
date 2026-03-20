@@ -1,6 +1,4 @@
-﻿using ContestService.API.DTO.MusicalInstrumentDtos;
-
-namespace ContestService.API.DTO.ParticipantDtos;
+﻿namespace ContestService.API.DTO.ParticipantDtos;
 
 public record ParticipantDto
 (
@@ -9,6 +7,6 @@ public record ParticipantDto
     string Surname,
     DateOnly Birthday,
     Guid MusicalInstrumentId,
-    string MusicalInstrumentName,
-    Guid NominationId
+    Guid NominationId,
+    Guid UserId
 );
