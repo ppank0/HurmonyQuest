@@ -4,16 +4,20 @@ using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
+using ContestService.DAL.Models;
 using ContestService.DAL.Repositories.Interfaces;
 using FluentAssertions;
 using Moq;
 using System.Linq.Expressions;
+using MockQueryable;
 
 namespace ContestService.BLL.Tests.ServiceTests;
 public class MusicalInstrumentServiceTests
 {
-    private readonly Mock<IRepositoryBase<MusicalInstrument>> _repositoryMock;
+    //private readonly Mock<IRepositoryBase<MusicalInstrument>> _repositoryMock;
     private readonly IMapper _mapper;
+    private readonly Mock<IRepositoryBase<Nomination>> _nominationRepoMock;
+    private readonly Mock<IMusicalInstrumentRepository> _instrumentRepoMock;
     private readonly MusicalInstrumentService _instrumentService;
 
     public MusicalInstrumentServiceTests()
@@ -24,8 +28,10 @@ public class MusicalInstrumentServiceTests
         });
         _mapper = config.CreateMapper();
 
-        _repositoryMock = new Mock<IRepositoryBase<MusicalInstrument>>();
-        _instrumentService = new  MusicalInstrumentService(_repositoryMock.Object, _mapper);
+       // _repositoryMock = new Mock<IRepositoryBase<MusicalInstrument>>();
+        _nominationRepoMock = new Mock<IRepositoryBase<Nomination>>();
+        _instrumentRepoMock = new Mock<IMusicalInstrumentRepository>();
+        _instrumentService = new  MusicalInstrumentService(_mapper, _nominationRepoMock.Object, _instrumentRepoMock.Object);
     }
 
     [Fact]
@@ -41,7 +47,7 @@ public class MusicalInstrumentServiceTests
 
         var entity = _mapper.Map<MusicalInstrument>(model);
 
-        _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<MusicalInstrument>(), It.IsAny<CancellationToken>())).ReturnsAsync(entity);
+        _instrumentRepoMock.Setup(r => r.CreateAsync(It.IsAny<MusicalInstrument>(), It.IsAny<CancellationToken>())).ReturnsAsync(entity);
 
         // Act
         var result = await _instrumentService.CreateAsync(model, CancellationToken.None);
@@ -57,17 +63,17 @@ public class MusicalInstrumentServiceTests
         var id = Guid.NewGuid();
         var entity = new MusicalInstrument { Id = id, Name = "Flute", NominationId = Guid.NewGuid() };
 
-        _repositoryMock
+        _instrumentRepoMock
             .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<MusicalInstrument, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<MusicalInstrument> { entity });
 
-        _repositoryMock.Setup(r => r.DeleteAsync(entity, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _instrumentRepoMock.Setup(r => r.DeleteAsync(entity, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         // Act
         await _instrumentService.DeleteAsync(id, CancellationToken.None);
 
         // Assert
-        _repositoryMock.Verify(r => r.DeleteAsync(entity, It.IsAny<CancellationToken>()), Times.Once);
+        _instrumentRepoMock.Verify(r => r.DeleteAsync(entity, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -75,7 +81,7 @@ public class MusicalInstrumentServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        _repositoryMock
+        _instrumentRepoMock
             .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<MusicalInstrument, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<MusicalInstrument>());
 
@@ -87,15 +93,15 @@ public class MusicalInstrumentServiceTests
     public async Task GetAllAsync_ShouldReturnInstrumentList()
     {
         // Arrange
-        var entities = new List<MusicalInstrument>
+        var entities = new List<MusicalInstrumentExtendedModel>
         {
-            new() { Id = Guid.NewGuid(), Name = "Piano", NominationId = Guid.NewGuid() },
-            new() { Id = Guid.NewGuid(), Name = "Guitar", NominationId = Guid.NewGuid() }
+            new() { Id = Guid.NewGuid(), Name = "Piano", NominationId = Guid.NewGuid(), NominationName = "nomination" },
+            new() { Id = Guid.NewGuid(), Name = "Guitar", NominationId = Guid.NewGuid(), NominationName = "nomination" }
         };
 
         var models = _mapper.Map<List<MusicalInstrumentModel>>(entities);
 
-        _repositoryMock.Setup(r => r.GetAllToListAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
+        _instrumentRepoMock.Setup(r => r.GetAllWithNominationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
 
         // Act
         var result = await _instrumentService.GetAllAsync(CancellationToken.None);
@@ -110,16 +116,24 @@ public class MusicalInstrumentServiceTests
         // Arrange
         var id = Guid.NewGuid();
         var entity = new MusicalInstrument { Id = id, Name = "Saxophone", NominationId = Guid.NewGuid() };
-        var model = _mapper.Map<MusicalInstrumentModel>(entity);
-
-        _repositoryMock
+        
+        _instrumentRepoMock
             .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<MusicalInstrument, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<MusicalInstrument> { entity });
+
+        var nominations = new List<Nomination> { new Nomination { Id = entity.NominationId, Name = "Jazz" } }.BuildMock();
+        _nominationRepoMock
+            .Setup(r => r.FindByCondition(It.IsAny<Expression<Func<Nomination, bool>>>(), It.IsAny<CancellationToken>()))
+            .Returns(nominations);
+
+        var model = _mapper.Map<MusicalInstrumentModel>(entity);
+        model.NominationName = nominations.First().Name;
 
         // Act
         var result = await _instrumentService.GetAsync(id, CancellationToken.None);
 
         // Assert
+        result.Should().NotBeNull();
         result.Should().BeEquivalentTo(model);
     }
 
@@ -129,7 +143,7 @@ public class MusicalInstrumentServiceTests
         // Arrange
         var id = Guid.NewGuid();
 
-        _repositoryMock
+        _instrumentRepoMock
             .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<MusicalInstrument, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<MusicalInstrument>());
 
@@ -143,7 +157,7 @@ public class MusicalInstrumentServiceTests
         // Arrange
         var model = new MusicalInstrumentModel { Id = Guid.NewGuid(), Name = "Oboe", NominationId = Guid.NewGuid() };
 
-        _repositoryMock
+        _instrumentRepoMock
             .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<MusicalInstrument, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<MusicalInstrument>());
 
@@ -176,11 +190,11 @@ public class MusicalInstrumentServiceTests
 
         var model = _mapper.Map<MusicalInstrumentModel>(updatedEntity);
 
-        _repositoryMock
+        _instrumentRepoMock
             .Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<MusicalInstrument, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<MusicalInstrument> { oldEntity });
 
-        _repositoryMock
+        _instrumentRepoMock
             .Setup(r => r.UpdateAsync(oldEntity, It.IsAny<CancellationToken>()))
             .ReturnsAsync(updatedEntity); 
 

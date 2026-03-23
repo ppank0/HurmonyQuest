@@ -7,25 +7,25 @@ using ContestService.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContestService.BLL.Services;
-public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> baseRepository, IMapper mapper,
+public class MusicalInstrumentService(IMapper mapper,
     IRepositoryBase<Nomination> nominationRepo, IMusicalInstrumentRepository instrumentRepo) : IMusicalInstrumentService
 {
     public async Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct)
     {
         var instrument = mapper.Map<MusicalInstrument>(musicalInstrument);
-        var createdInstrument = await baseRepository.CreateAsync(instrument, ct);
+        var createdInstrument = await instrumentRepo.CreateAsync(instrument, ct);
 
         return mapper.Map<MusicalInstrumentModel>(createdInstrument);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var musicalInstruments = await baseRepository.FindByConditionAsync(p => p.Id == id, ct);
+        var musicalInstruments = await instrumentRepo.FindByConditionAsync(p => p.Id == id, ct);
         var musicalInstrument = musicalInstruments.FirstOrDefault();
 
         if (musicalInstrument is not null)
         {
-            await baseRepository.DeleteAsync(musicalInstrument, ct);
+            await instrumentRepo.DeleteAsync(musicalInstrument, ct);
         }
         else
         {
@@ -42,7 +42,7 @@ public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> baseRep
 
     public async Task<MusicalInstrumentModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var instrumentList = await baseRepository.FindByConditionAsync(s => s.Id == id, ct);
+        var instrumentList = await instrumentRepo.FindByConditionAsync(s => s.Id == id, ct);
         var musicalInstrument = instrumentList.FirstOrDefault();
 
         if (musicalInstrument is null)
@@ -58,7 +58,7 @@ public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> baseRep
 
     public async Task<MusicalInstrumentModel> UpdateAsync(MusicalInstrumentModel model, CancellationToken ct)
     {
-        var instrumentList = await baseRepository.FindByConditionAsync(s => s.Id == model.Id, ct);
+        var instrumentList = await instrumentRepo.FindByConditionAsync(s => s.Id == model.Id, ct);
         var entityToUpdate = instrumentList.FirstOrDefault();
 
         if (entityToUpdate is null)
@@ -67,7 +67,7 @@ public class MusicalInstrumentService(IRepositoryBase<MusicalInstrument> baseRep
         }
 
         mapper.Map(model, entityToUpdate);
-        await baseRepository.UpdateAsync(entityToUpdate, ct);
+        await instrumentRepo.UpdateAsync(entityToUpdate, ct);
 
         return mapper.Map<MusicalInstrumentModel>(entityToUpdate);
     }
