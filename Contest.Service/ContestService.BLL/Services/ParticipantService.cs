@@ -6,6 +6,7 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
 namespace ContestService.BLL.Services;
+
 public class ParticipantService(IParticipantRepository participantRepository,
         INominationRepository nominationRepository, IMusicalInstrumentService instrumentService,
         IMapper mapper) : IParticipantService
@@ -18,7 +19,7 @@ public class ParticipantService(IParticipantRepository participantRepository,
         }
 
         var newParticipant = mapper.Map<Participant>(model);
-        var createdParticipant = await participantRepository.CreateAsync(newParticipant, ct); 
+        var createdParticipant = await participantRepository.CreateAsync(newParticipant, ct);
         var resultParticipant = mapper.Map<ParticipantModel>(createdParticipant);
         resultParticipant.NominationId = model.NominationId;
 

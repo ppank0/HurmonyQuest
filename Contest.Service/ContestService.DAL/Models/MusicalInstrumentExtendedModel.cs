@@ -3,7 +3,7 @@
 public class MusicalInstrumentExtendedModel
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public Guid NominationId { get; set; }
-    public string NominationName { get; set; }
+    public string NominationName { get; set; } = string.Empty;
 }

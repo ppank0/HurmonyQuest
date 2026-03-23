@@ -15,7 +15,7 @@ internal class MusicalInstrumentRepository(AppDbContext context) : RepositoryBas
             Id = x.Id,
             Name = x.Name,
             NominationId = x.NominationId,
-            NominationName = x.Nomination.Name
+            NominationName = x.Nomination!.Name
         }).ToListAsync(ct);
     }
 }
