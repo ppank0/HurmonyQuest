@@ -6,7 +6,7 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
 namespace ContestService.BLL.Services;
-public class ParticipantService(IRepositoryBase<Participant> repository, IParticipantRepository participantRepository,
+public class ParticipantService(IParticipantRepository participantRepository,
         INominationRepository nominationRepository, IMusicalInstrumentService instrumentService,
         IMapper mapper) : IParticipantService
 {
@@ -18,7 +18,7 @@ public class ParticipantService(IRepositoryBase<Participant> repository, IPartic
         }
 
         var newParticipant = mapper.Map<Participant>(model);
-        var createdParticipant = await repository.CreateAsync(newParticipant, ct); 
+        var createdParticipant = await participantRepository.CreateAsync(newParticipant, ct); 
         var resultParticipant = mapper.Map<ParticipantModel>(createdParticipant);
         resultParticipant.NominationId = model.NominationId;
 
@@ -27,12 +27,12 @@ public class ParticipantService(IRepositoryBase<Participant> repository, IPartic
 
     public async Task DeleteAsync(Guid id, CancellationToken ct)
     {
-        var participants = await repository.FindByConditionAsync(p => p.Id == id, ct);
+        var participants = await participantRepository.FindByConditionAsync(p => p.Id == id, ct);
         var participant = participants.FirstOrDefault();
 
         if (participant is not null)
         {
-            await repository.DeleteAsync(participant, ct);
+            await participantRepository.DeleteAsync(participant, ct);
         }
         else
         {
@@ -48,7 +48,7 @@ public class ParticipantService(IRepositoryBase<Participant> repository, IPartic
 
     public async Task<ParticipantModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var participantList = await repository.FindByConditionAsync(p => p.Id == id, ct);
+        var participantList = await participantRepository.FindByConditionAsync(p => p.Id == id, ct);
         var participant = participantList.FirstOrDefault();
         if (participant is null)
         {
@@ -65,7 +65,7 @@ public class ParticipantService(IRepositoryBase<Participant> repository, IPartic
 
     public async Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct)
     {
-        var participantList = await repository.FindByConditionAsync(p => p.Id == model.Id, ct);
+        var participantList = await participantRepository.FindByConditionAsync(p => p.Id == model.Id, ct);
         var entityToUpdate = participantList.FirstOrDefault();
 
         if (entityToUpdate is null)
@@ -74,7 +74,7 @@ public class ParticipantService(IRepositoryBase<Participant> repository, IPartic
         }
 
         mapper.Map(model, entityToUpdate);
-        var updatedParticipant = await repository.UpdateAsync(entityToUpdate, ct);
+        var updatedParticipant = await participantRepository.UpdateAsync(entityToUpdate, ct);
 
         return mapper.Map<ParticipantModel>(updatedParticipant);
     }
