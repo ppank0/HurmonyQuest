@@ -9,7 +9,7 @@ public class NominationRepository(AppDbContext context) : RepositoryBase<Nominat
     public bool IsMusicalInstrumentInNomination(Guid NominationId, Guid MusicalInstrumentId)
     {
         return _context.Nominations.Any(n => n.Id == NominationId &&
-                            n.Instruments.Any(i => i.Id == MusicalInstrumentId));
+                            n.Instruments!.Any(i => i.Id == MusicalInstrumentId));
     }
 
 }

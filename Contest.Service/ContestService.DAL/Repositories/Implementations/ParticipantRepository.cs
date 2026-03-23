@@ -1,7 +1,6 @@
 ﻿using ContestService.DAL.Context;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Models;
-
 using ContestService.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +17,9 @@ public class ParticipantRepository(AppDbContext context) : RepositoryBase<Partic
             Surname = p.Surname,
             Birthday = p.Birthday,
             MusicalInstrumentId = p.MusicalInstrumentId,
-            MusicalInstrumentName = p.MusicalInstrument.Name,
+            MusicalInstrumentName = p.MusicalInstrument!.Name,
             NominationId = p.MusicalInstrument.NominationId,
-            NominationName = p.MusicalInstrument.Nomination.Name
+            NominationName = p.MusicalInstrument.Nomination!.Name
         }).ToListAsync(ct);
     }
 }

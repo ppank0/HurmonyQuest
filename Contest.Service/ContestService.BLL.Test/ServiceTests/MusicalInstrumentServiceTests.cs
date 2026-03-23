@@ -14,7 +14,6 @@ using MockQueryable;
 namespace ContestService.BLL.Tests.ServiceTests;
 public class MusicalInstrumentServiceTests
 {
-    //private readonly Mock<IRepositoryBase<MusicalInstrument>> _repositoryMock;
     private readonly IMapper _mapper;
     private readonly Mock<IRepositoryBase<Nomination>> _nominationRepoMock;
     private readonly Mock<IMusicalInstrumentRepository> _instrumentRepoMock;
@@ -28,7 +27,6 @@ public class MusicalInstrumentServiceTests
         });
         _mapper = config.CreateMapper();
 
-       // _repositoryMock = new Mock<IRepositoryBase<MusicalInstrument>>();
         _nominationRepoMock = new Mock<IRepositoryBase<Nomination>>();
         _instrumentRepoMock = new Mock<IMusicalInstrumentRepository>();
         _instrumentService = new  MusicalInstrumentService(_mapper, _nominationRepoMock.Object, _instrumentRepoMock.Object);
