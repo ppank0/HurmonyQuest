@@ -12,11 +12,11 @@ export const ContestService = {
             return response;
         },
         async create(newNominations: editNomination){
-            const response = await contestApi.post<editNomination>("/nominations", newNominations)
+            const response = await contestApi.post<Nomination>("/nominations", newNominations)
             return response.data;
         },
         async update(id: string, toUpdate: editNomination){
-            const response = await contestApi.patch<editNomination>(`/nomination/${id}`, toUpdate)
+            const response = await contestApi.put<Nomination>(`/nominations/${id}`, toUpdate)
             return response.data;
         },
         async delete(id: string){

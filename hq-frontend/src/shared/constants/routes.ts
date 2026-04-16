@@ -1,4 +1,5 @@
 export const paths = {
     Home: '/',
-    About:'/about'
+    About:'/about',
+    AdminPanel: '/admin'
 } as const
