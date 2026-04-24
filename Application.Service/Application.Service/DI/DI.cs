@@ -1,4 +1,4 @@
-﻿using Application.Service.Extensions;
+using Application.Service.Extensions;
 using Application.Service.HttpClients;
 using Application.Service.Mapper;
 using Application.Service.Options;

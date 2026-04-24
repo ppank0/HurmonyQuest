@@ -13,6 +13,7 @@ namespace ContestService.API.Controller;
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<List<MusicalInstrumentDto>> GetAll(CancellationToken ct)
     {
         var instruments = await instrumentService.GetAllAsync(ct);
@@ -21,6 +22,7 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<MusicalInstrumentDto> Get(Guid id, CancellationToken ct)
     {
         var instrument = await instrumentService.GetAsync(id, ct);

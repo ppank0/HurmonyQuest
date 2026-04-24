@@ -1,0 +1,7 @@
+@NotificationService_HostAddress = http://localhost:5117
+
+
+GET{{NotificationService_HostAddress}}/notifications/
+Accept: application/json
+
+###

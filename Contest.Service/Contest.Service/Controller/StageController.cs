@@ -13,6 +13,7 @@ namespace ContestService.API.Controller;
 public class StageController(IStageService stageService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
+    [AllowAnonymous]
     public async Task<List<StageDto>> GetAll(CancellationToken ct)
     {
         var result = await stageService.GetAllAsync(ct);

@@ -26,6 +26,7 @@ namespace Application.Service
 
             app.UseHttpsRedirection();
 
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

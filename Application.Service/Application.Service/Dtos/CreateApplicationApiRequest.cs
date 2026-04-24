@@ -1,6 +1,6 @@
-﻿namespace Application.Service.Dtos
+namespace Application.Service.Dtos
 {
-    public class CreateApplicationApiRequest
+    public record CreateApplicationApiRequest
     {
         public string Name { get; set; }
         public string Surname { get; set; }

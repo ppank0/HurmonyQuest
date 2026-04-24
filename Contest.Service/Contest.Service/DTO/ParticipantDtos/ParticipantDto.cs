@@ -9,6 +9,6 @@ public record ParticipantDto
     string Surname,
     DateOnly Birthday,
     Guid MusicalInstrumentId,
-    MusicalInstrumentDto? MusicalInstrument,
+    string MusicalInstrumentName,
     Guid NominationId
 );

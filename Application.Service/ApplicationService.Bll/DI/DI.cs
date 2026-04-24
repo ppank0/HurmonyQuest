@@ -1,9 +1,10 @@
-﻿using ApplicationService.Bll.Integrations.Infractructure;
+using ApplicationService.Bll.Integrations.Infractructure;
 using ApplicationService.BLL.Interfaces;
 using ApplicationService.BLL.Mapper;
 using ApplicationService.BLL.Repositories.Interfaces;
 using ApplicationService.BLL.Services;
 using ApplicationService.DAL.DI;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
@@ -23,10 +24,11 @@ namespace ApplicationService.BLL.DI
             services.AddScoped<IVideoService, VideoService>();
             services.AddScoped<IVideoStorage, MinioStorage>();
             services.AddScoped<IApplicationService, AppService>();
+
             services.AddScoped<ITokenCache, TokenCache>();
-
-
             MinioOptions = configuration.GetSection("Minio").Get<MinioOptions>();
+            var rabbitmqUsername = configuration.GetRequiredSection("RabbitMq:UserName").Value;
+            var rabbitmqPassword = configuration.GetRequiredSection("RabbitMq:Password").Value;
 
             services.AddSingleton<IMinioClient>(sp =>
                  new MinioClient()
@@ -39,6 +41,19 @@ namespace ApplicationService.BLL.DI
             {
                 op.Configuration = configuration.GetConnectionString("RedisConnection");
                 op.InstanceName = "App_service:";
+
+            services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost", "/", host =>
+                    {
+                        host.Username(rabbitmqUsername!);
+                        host.Password(rabbitmqPassword!);
+                    });
+
+                });
+
             });
 
             return services;
