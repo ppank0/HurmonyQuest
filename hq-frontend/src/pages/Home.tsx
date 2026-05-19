@@ -1,7 +1,7 @@
 import { Container, Typography, Divider, Box} from '@mui/material'
 import girls from '../assets/girls.png'
 import frame from '../assets/patterned_frame.png'
-import main_img from '../assets/скрипка.png'
+import main_img from '../assets/violin.png'
 
 export const Home = () => {
   return (
