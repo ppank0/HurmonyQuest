@@ -1,7 +1,7 @@
 import { Container, Typography, Divider, Box} from '@mui/material'
-import girls from '../assets/girls.png'
-import frame from '../assets/patterned_frame.png'
-import main_img from '../assets/violin.png'
+import girls from '../assets/girls.webp'
+import frame from '../assets/patterned_frame.webp'
+import main_img from '../assets/violin.webp'
 
 export const Home = () => {
   return (
@@ -34,18 +34,18 @@ export const Home = () => {
 
       <Box sx={{display: 'flex', gap: '15vw',  mt:'25vh', mb: "5vh"}}>
         <Box sx={{textAlign: 'center', ml: '2vw'}}>
-          <img  src={frame}/>
+          <img  src={frame} loading='lazy' decoding='async'/>
           <Typography width={'40vw'} variant='body1'>“Hurmony Quest” is an annual competition of classical performance,
               bringing together virtuosos, sensitive artists, and true connoisseurs.
                Our mission is to maintain the highest level of artistry,
                breathe new life into masterpieces of world classical music,
                and discover emerging talents.
           </Typography>
-          <img src={frame} style={{ transform: "rotate(180deg)"}} />
+          <img src={frame} loading='lazy' decoding='async' style={{ transform: "rotate(180deg)"}} />
         </Box>
 
         <Box sx={{borderLeft: '0.8vw solid', pl: '5vw', borderColor: 'secondary.main'}}>
-            <img  src={girls}/>
+            <img src={girls} loading='lazy' decoding='async'/>
         </Box>
       </Box>
       
