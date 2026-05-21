@@ -6,7 +6,7 @@ export const userManager = new UserManager({
     response_type: 'code',
     redirect_uri: 'http://localhost:5173/signin-oidc',
     post_logout_redirect_uri: 'http://localhost:5173/signout-callback-oidc',
-    scope: 'openid profile roles offline_access roles',
+    scope: 'openid profile roles offline_access',
     userStore: new WebStorageStateStore({store: localStorage}),
     automaticSilentRenew: true
 });
