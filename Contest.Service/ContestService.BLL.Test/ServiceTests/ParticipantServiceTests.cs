@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
+using ContestService.BLL.Interfaces;
 using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
+using ContestService.DAL.Models;
 using ContestService.DAL.Repositories.Interfaces;
 using FluentAssertions;
 using Moq;
@@ -14,6 +16,7 @@ public class ParticipantServiceTests
 {
     private readonly Mock<IParticipantRepository> _repositoryMock = new();
     private readonly Mock<INominationRepository> _nominationRepoMock = new();
+    private readonly Mock<IMusicalInstrumentService> _instrumentService;
     private readonly IMapper _mapper;
     private readonly ParticipantService _service;
 
@@ -24,8 +27,8 @@ public class ParticipantServiceTests
             cfg.AddProfile<MappingProfile>(); // та же конфигурация, что в BLL
         });
         _mapper = config.CreateMapper();
-
-        _service = new ParticipantService(_repositoryMock.Object, _nominationRepoMock.Object, _mapper);
+        _instrumentService = new Mock<IMusicalInstrumentService>();
+        _service = new ParticipantService(_repositoryMock.Object, _nominationRepoMock.Object, _instrumentService.Object, _mapper);
     }
 
     [Fact]
@@ -114,19 +117,21 @@ public class ParticipantServiceTests
     public async Task GetAllAsync_ShouldReturnListOfParticipants()
     {
         //Arrange
-        var entities = new List<Participant> { new Participant
+        var entities = new List<ParticipantExtendedModel> { new ParticipantExtendedModel
         {
             Id = Guid.NewGuid(),
             Name = "Anna",
             Surname = "Smith",
             Birthday = new DateOnly(2000, 1, 1),
             MusicalInstrumentId = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            MusicalInstrumentName = "instrument",
+            NominationId = Guid.NewGuid(),
+            NominationName = "nomination",
+            UserId = Guid.NewGuid(),
         } };
         var models = _mapper.Map<List<ParticipantModel>>(entities);
 
-        _repositoryMock.Setup(r => r.GetAllWithRelationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.GetAllWithDetails(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
 
         //Act
         var result = await _service.GetAllAsync(CancellationToken.None);
@@ -142,7 +147,7 @@ public class ParticipantServiceTests
         var id = Guid.NewGuid();
         var entity = new Participant
         {
-            Id = Guid.NewGuid(),
+            Id = id,
             Name = "Anna",
             Surname = "Smith",
             Birthday = new DateOnly(2000, 1, 1),
@@ -150,11 +155,15 @@ public class ParticipantServiceTests
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
-
-        var model = _mapper.Map<ParticipantModel>(entity);
+        var instrument = new MusicalInstrumentModel { Id = entity.MusicalInstrumentId, Name = "instrument", NominationId = Guid.NewGuid(), NominationName = "nomination" };
 
         _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Participant, bool>>>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync([entity]);
+                       .ReturnsAsync(new List<Participant> {entity});
+        _instrumentService.Setup(i => i.GetAsync(instrument.Id, It.IsAny<CancellationToken>())).ReturnsAsync(instrument);
+
+        var model = _mapper.Map<ParticipantModel>(entity);
+        model.NominationId = instrument.NominationId;
+        model.NominationName = instrument.NominationName;
 
         //Act
         var result = await _service.GetAsync(id, CancellationToken.None);

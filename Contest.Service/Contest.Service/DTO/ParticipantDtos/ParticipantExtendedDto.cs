@@ -1,12 +1,13 @@
 ﻿namespace ContestService.API.DTO.ParticipantDtos;
 
-public record ParticipantDto
+public record ParticipantExtendedDto
 (
     Guid Id,
     string Name,
     string Surname,
     DateOnly Birthday,
     Guid MusicalInstrumentId,
-    Guid NominationId,
+    string MusicalInstrumentName,
+    Guid NominationId, string NominationName,
     Guid UserId
 );
