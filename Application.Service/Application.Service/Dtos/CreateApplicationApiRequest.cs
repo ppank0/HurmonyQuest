@@ -1,4 +1,4 @@
-﻿namespace Application.Service.Dtos
+namespace Application.Service.Dtos
 {
     public record CreateApplicationApiRequest
     {

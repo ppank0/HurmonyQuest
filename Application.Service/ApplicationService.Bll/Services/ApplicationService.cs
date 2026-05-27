@@ -36,6 +36,7 @@ namespace ApplicationService.BLL.Services
 
             await unitOfWork.Applications.CreateAsync(appEntity, ct);
             await unitOfWork.SaveAsync(ct);
+
             await publishEndpoint.Publish<IApplicationEvent>(new
             {
                 UserId = participant.Id,
