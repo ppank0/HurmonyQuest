@@ -1,9 +1,14 @@
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material"
-import { useAuth } from "../../shared/contexts/AuthContext"
 import { NavBar } from "./NavBar"
+import { useAuthStore } from "../../shared/stores/AuthStore";
 
 export const Header = () => {
-    const {role, login, logout, isAuthenticated, isLoading} = useAuth();
+    const login = useAuthStore((state) => state.login)
+    const logout = useAuthStore((state) => state.logout)
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+    const isLoading = useAuthStore((state) => state.isLoading)
+    const role = useAuthStore((state) => state.role)
+    
     return ( 
         <>
             {isLoading ? <Box className="header" sx={{backgroundColor: 'primary.dark', display: 'flex',
