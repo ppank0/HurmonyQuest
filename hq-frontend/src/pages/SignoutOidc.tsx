@@ -7,13 +7,17 @@ export function SignoutOidc(){
     const navigate = useNavigate();
 
     useEffect(() => {
-            userManager.signoutRedirectCallback()
-            .then(() => navigate("/"))
-            .catch((error:Error) => {
+        const handkeSighOutOidc = async() => {
+            try{
+                await userManager.signoutRedirectCallback()
+                navigate("/")
+            }
+            catch(error: any){
                 console.log("Sign out error: " + error.message)
                 navigate("/")
-            })
-        
+            }
+        }
+        handkeSighOutOidc()
     }, [navigate])
     return (
         <Typography variant="subtitle1">Processing logout...</Typography>
