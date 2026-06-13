@@ -46,11 +46,7 @@ namespace NotificationService.Services.Implementation
         }
         public async Task SendAsync(NotificationModel model, CancellationToken ct)
         {
-            var isCompletedSuccessfully = await _notificationSender.SendNotification(model, ct);
-            if (isCompletedSuccessfully)
-            {
-                await UpdateStatus(model.Id.ToString(), NotificationStatus.Sent, ct);
-            }
+            await _notificationSender.SendNotification(model, ct);
         }
 
         public async Task<List<NotificationModel>> GetAll(CancellationToken ct)

@@ -1,10 +1,12 @@
-﻿using NotificationService.Data.Enums;
+﻿using Microsoft.AspNetCore.SignalR;
+using NotificationService.Data.Enums;
 using NotificationService.Data.Models;
+using NotificationService.Services.Hubs;
 using NotificationService.Services.Interfaces;
 
 namespace NotificationService.Services.Implementation
 {
-    public class NotificationSenderService() : INotificationSenderService
+    public class NotificationSenderService(IHubContext<NotificationHub> hubContext) : INotificationSenderService
     {
         private static void SetTargetType(NotificationModel notification, CancellationToken ct)
         {
@@ -16,7 +18,7 @@ namespace NotificationService.Services.Implementation
             };
         }
 
-        public async Task<bool> SendNotification(NotificationModel notification, CancellationToken ct)
+        public async Task SendNotification(NotificationModel notification, CancellationToken ct)
         {
             SetTargetType(notification, ct);
 
@@ -26,15 +28,14 @@ namespace NotificationService.Services.Implementation
                 {
                     case TargetType.User:
                         {
-                            //var isReceived = await hubContext.Clients.User(notification.UserId!)
-                            //.InvokeAsync<bool>("ReceiveMessage", notification, ct);
-                            var isReceived = true;
-                            return isReceived;
+                            await hubContext.Clients.User(notification.UserId!)
+                                .SendAsync("ReceiveMessage", notification.Id.ToString(), notification, ct);
+                            break;
                         }
                     case TargetType.Group:
                         {
                             //await hubContext.Clients.Group(notification.TargetGroup!)
-                            //    .SendAsync("ReceiveMessage", notification, ct);
+                            //   .SendAsync("ReceiveMessage", notification, ct);
                             break;
                         }
                 }
@@ -42,9 +43,7 @@ namespace NotificationService.Services.Implementation
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                return false;
             }
-            return false;
         }
     }
 }
