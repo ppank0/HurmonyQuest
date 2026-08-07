@@ -5,11 +5,12 @@ using ApplicationService.DAL.Entities;
 using ApplicationService.DAL.UnitOfWork;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static ApplicationService.BLL.Consts.MinIOConsts;
 
 namespace ApplicationService.BLL.Services
 {
-    public class VideoService(IUnitOfWork uOw, IMapper mapper, IVideoStorage videoStorage) : IVideoService
+    public class VideoService(IUnitOfWork uOw, IMapper mapper, IVideoStorage videoStorage, ILogger<VideoService> logger) : IVideoService
     {
         public async Task<FileContentResultModel> GetAsync(string videoName, CancellationToken ct)
         {
@@ -24,6 +25,7 @@ namespace ApplicationService.BLL.Services
             await uOw.Videos.CreateAsync(videoEntity, ct);
 
             await uOw.SaveAsync(ct);
+            logger.LogInformation("Video was successfully created with id: {VideoId}", videoEntity.Id);
 
             return mapper.Map<VideoModel>(videoEntity);
         }
