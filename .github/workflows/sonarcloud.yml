@@ -33,7 +33,7 @@ jobs:
         fetch-depth: 0
 
     - name: Sonar Scan
-      uses: highbyte/sonarscan-dotnet@v2.3.4
+      uses: highbyte/sonarscan-dotnet@v2.4.3
       with:
         sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
         sonarProjectName: ${{ vars.SONARPROJECTNAME }}
