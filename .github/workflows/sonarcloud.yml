@@ -39,7 +39,7 @@ jobs:
         java-version: '21'
 
     - name: Sonar Scan
-      uses: highbyte/sonarscan-dotnet@v2.3.0
+      uses: SonarSource/sonarcloud-github-action@v3.1.0
       with:
         sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
         sonarProjectName: ${{ vars.SONARPROJECTNAME }}
