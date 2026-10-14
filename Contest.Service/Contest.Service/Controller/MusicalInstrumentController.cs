@@ -14,11 +14,11 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<MusicalInstrumentExtendedDto>> GetAll(CancellationToken ct)
+    public async Task<List<MusicalInstrumentDto>> GetAll(CancellationToken ct)
     {
         var instruments = await instrumentService.GetAllAsync(ct);
 
-        return mapper.Map<List<MusicalInstrumentExtendedDto>>(instruments);
+        return mapper.Map<List<MusicalInstrumentDto>>(instruments);
     }
 
     [HttpGet("{id}")]

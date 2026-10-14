@@ -4,11 +4,10 @@ using ContestService.BLL.Interfaces;
 using ContestService.BLL.Models;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace ContestService.BLL.Services;
-public class MusicalInstrumentService(IMapper mapper,
-    IRepositoryBase<Nomination> nominationRepo, IMusicalInstrumentRepository instrumentRepo) : IMusicalInstrumentService
+
+public class MusicalInstrumentService(IMapper mapper, IMusicalInstrumentRepository instrumentRepo) : IMusicalInstrumentService
 {
     public async Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct)
     {
@@ -23,36 +22,30 @@ public class MusicalInstrumentService(IMapper mapper,
         var musicalInstruments = await instrumentRepo.FindByConditionAsync(p => p.Id == id, ct);
         var musicalInstrument = musicalInstruments.FirstOrDefault();
 
-        if (musicalInstrument is not null)
-        {
-            await instrumentRepo.DeleteAsync(musicalInstrument, ct);
-        }
-        else
+        if (musicalInstrument is null)
         {
             throw new NotFoundException($"Instrument with id {id} was not found");
         }
+        await instrumentRepo.DeleteAsync(musicalInstrument, ct);
     }
 
     public async Task<List<MusicalInstrumentModel>> GetAllAsync(CancellationToken ct)
     {
-        var entitiesList = await instrumentRepo.GetAllWithNominationsAsync(ct);
+        var entitiesList = await instrumentRepo.GetAllToListAsync(ct);
 
         return mapper.Map<List<MusicalInstrumentModel>>(entitiesList);
     }
 
     public async Task<MusicalInstrumentModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var instrumentList = await instrumentRepo.FindByConditionAsync(s => s.Id == id, ct);
-        var musicalInstrument = instrumentList.FirstOrDefault();
+        var instrument = await instrumentRepo.GetByIdWithNominationAsync(id, ct);
 
-        if (musicalInstrument is null)
+        if (instrument is null)
         {
             throw new NotFoundException($"Instrument with id {id} was not found");
         }
-
-        var model = mapper.Map<MusicalInstrumentModel>(musicalInstrument);
-        var nominationName = await nominationRepo.FindByCondition(x => x.Id == model.NominationId, ct).Select(x => x.Name).FirstOrDefaultAsync(ct);
-        model.NominationName = nominationName ?? null;
+        var model = mapper.Map<MusicalInstrumentModel>(instrument);
+        //model.NominationName = instrument?.Nomination?.Name ?? string.Empty;
         return model;
     }
 

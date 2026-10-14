@@ -8,7 +8,7 @@ using ContestService.DAL.Repositories.Interfaces;
 namespace ContestService.BLL.Services;
 
 public class ParticipantService(IParticipantRepository participantRepository,
-        INominationRepository nominationRepository, IMusicalInstrumentService instrumentService,
+        INominationRepository nominationRepository,
         IMapper mapper) : IParticipantService
 {
     public async Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct)
@@ -49,21 +49,17 @@ public class ParticipantService(IParticipantRepository participantRepository,
 
     public async Task<ParticipantModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var participantList = await participantRepository.FindByConditionAsync(p => p.Id == id, ct);
-        var participant = participantList.FirstOrDefault();
+        var participant = await participantRepository.GetByIdWithDetails(id, ct);
+
         if (participant is null)
         {
             throw new NotFoundException("entity participant was not found");
         }
-        var additionalInfo = await instrumentService.GetAsync(participant.MusicalInstrumentId, ct);
-        var participantModel = mapper.Map<ParticipantModel>(participant);
 
-        participantModel.NominationId = additionalInfo.NominationId;
-        participantModel.NominationName = additionalInfo.NominationName;
+        var participantModel = mapper.Map<ParticipantModel>(participant);
 
         return participantModel;
     }
-
     public async Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct)
     {
         var participantList = await participantRepository.FindByConditionAsync(p => p.Id == model.Id, ct);
