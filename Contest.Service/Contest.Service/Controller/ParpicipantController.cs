@@ -9,27 +9,28 @@ namespace ContestService.API.Controller;
 
 [Route("api/participants")]
 [ApiController]
-[Authorize]
+//[Authorize]
 public class ParpicipantController(IParticipantService participantService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<ParticipantDto>> GetAll(CancellationToken ct)
+    public async Task<List<ParticipantExtendedDto>> GetAll(CancellationToken ct)
     {
         var result = await participantService.GetAllAsync(ct);
 
-        return mapper.Map<List<ParticipantDto>>(result);
+        return mapper.Map<List<ParticipantExtendedDto>>(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<ParticipantDto> Get(Guid id, CancellationToken ct)
+    public async Task<ParticipantExtendedDto> Get(Guid id, CancellationToken ct)
     {
         var result = await participantService.GetAsync(id, ct);
 
-        return mapper.Map<ParticipantModel, ParticipantDto>(result);
+        return mapper.Map<ParticipantExtendedDto>(result);
     }
 
     [HttpPost]
+    //[Authorize("CreateParticipant")]
     public async Task<ParticipantDto> Create([FromBody] ParticipantEditDto participantDto, CancellationToken ct)
     {
         var participantModel = mapper.Map<ParticipantModel>(participantDto);
@@ -39,7 +40,6 @@ public class ParpicipantController(IParticipantService participantService, IMapp
     }
 
     [HttpPut("{id}")]
-    [Authorize("edit:participant-edit-own")]
     public async Task<ParticipantDto> Update(Guid id, [FromBody] ParticipantEditDto participantDto, CancellationToken ct)
     {
         var participantModel = await participantService.GetAsync(id, ct);

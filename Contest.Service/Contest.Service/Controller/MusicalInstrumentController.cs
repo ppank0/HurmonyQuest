@@ -9,7 +9,7 @@ namespace ContestService.API.Controller;
 
 [Route("api/instruments")]
 [ApiController]
-[Authorize]
+//[Authorize]
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
@@ -23,11 +23,11 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
 
     [HttpGet("{id}")]
     [AllowAnonymous]
-    public async Task<MusicalInstrumentDto> Get(Guid id, CancellationToken ct)
+    public async Task<MusicalInstrumentExtendedDto> Get(Guid id, CancellationToken ct)
     {
         var instrument = await instrumentService.GetAsync(id, ct);
 
-        return mapper.Map<MusicalInstrumentDto>(instrument);
+        return mapper.Map<MusicalInstrumentExtendedDto>(instrument);
     }
 
     [HttpPost]

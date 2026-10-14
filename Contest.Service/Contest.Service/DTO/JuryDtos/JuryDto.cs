@@ -5,5 +5,6 @@ public record JuryDto
     Guid Id,
     string Name,
     string Surname,
-    DateOnly Birthday
+    DateOnly Birthday,
+    Guid UserId
 );

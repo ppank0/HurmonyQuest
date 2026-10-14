@@ -23,8 +23,10 @@ public class MappingProfile : Profile
 
         CreateMap<ParticipantDto, ParticipantModel>().ReverseMap();
         CreateMap<ParticipantEditDto, ParticipantModel>();
+        CreateMap<ParticipantModel, ParticipantExtendedDto>();
 
         CreateMap<MusicalInstrumentDto, MusicalInstrumentModel>().ReverseMap();
-        CreateMap<MusicalInstrumentEditDto, MusicalInstrumentModel>();  
+        CreateMap<MusicalInstrumentEditDto, MusicalInstrumentModel>();
+        CreateMap<MusicalInstrumentModel, MusicalInstrumentExtendedDto>();
     }
 }

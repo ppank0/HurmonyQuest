@@ -6,5 +6,6 @@ public record JuryEditDto
 (
     string Name,
     string Surname,
-    DateOnly Birthday 
+    DateOnly Birthday,
+    Guid UserId
 );
