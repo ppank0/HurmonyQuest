@@ -8,6 +8,7 @@ public record ParticipantExtendedDto
     DateOnly Birthday,
     Guid MusicalInstrumentId,
     string MusicalInstrumentName,
-    Guid NominationId, string NominationName,
+    Guid NominationId,
+    string NominationName,
     Guid UserId
 );
