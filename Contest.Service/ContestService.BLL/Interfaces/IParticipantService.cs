@@ -1,4 +1,4 @@
-﻿using ContestService.BLL.Models;
+﻿using ContestService.BLL.Models.Participant;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ public interface IParticipantService
 {
     Task<List<ParticipantModel>> GetAllAsync(CancellationToken ct);
     Task<ParticipantModel> GetAsync(Guid id, CancellationToken ct);
-    Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct);
+    Task<ParticipantModel> CreateAsync(ParticipantEditModel model, CancellationToken ct);
     Task<ParticipantModel> UpdateAsync(ParticipantModel model, CancellationToken ct);
     Task DeleteAsync(Guid id, CancellationToken ct);
 }

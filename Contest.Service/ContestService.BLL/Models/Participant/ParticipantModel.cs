@@ -1,4 +1,4 @@
-﻿namespace ContestService.BLL.Models;
+﻿namespace ContestService.BLL.Models.Participant;
 
 public class ParticipantModel : ModelBase
 {
@@ -6,7 +6,7 @@ public class ParticipantModel : ModelBase
     public required string Surname { get; set; }
     public DateOnly Birthday { get; set; }
     public Guid MusicalInstrumentId { get; set; }
-    public string MusicalInstrumentName { get; set; } = null!;
+    public string MusicalInstrumentName { get; set; } = string.Empty;
     public Guid NominationId { get; set; }
     public string NominationName { get; set; } = string.Empty;
     public Guid UserId { get; set; }
