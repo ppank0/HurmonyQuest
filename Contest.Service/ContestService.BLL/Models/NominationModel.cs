@@ -1,4 +1,6 @@
-﻿namespace ContestService.BLL.Models;
+﻿using ContestService.BLL.Models.MusicalInstrument;
+
+namespace ContestService.BLL.Models;
 
 public class NominationModel : ModelBase
 {

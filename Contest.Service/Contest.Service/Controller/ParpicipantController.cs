@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ContestService.API.DTO.ParticipantDtos;
 using ContestService.BLL.Interfaces;
-using ContestService.BLL.Models;
+using ContestService.BLL.Models.Participant;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,38 +14,37 @@ public class ParpicipantController(IParticipantService participantService, IMapp
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<ParticipantDto>> GetAll(CancellationToken ct)
+    public async Task<List<ParticipantExtendedDto>> GetAll(CancellationToken ct)
     {
         var result = await participantService.GetAllAsync(ct);
 
-        return mapper.Map<List<ParticipantDto>>(result);
+        return mapper.Map<List<ParticipantExtendedDto>>(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<ParticipantDto> Get(Guid id, CancellationToken ct)
+    public async Task<ParticipantExtendedDto> Get(Guid id, CancellationToken ct)
     {
         var result = await participantService.GetAsync(id, ct);
 
-        return mapper.Map<ParticipantModel, ParticipantDto>(result);
+        return mapper.Map<ParticipantExtendedDto>(result);
     }
 
     [HttpPost]
+    [Authorize("CreateParticipant")]
     public async Task<ParticipantDto> Create([FromBody] ParticipantEditDto participantDto, CancellationToken ct)
     {
-        var participantModel = mapper.Map<ParticipantModel>(participantDto);
+        var participantModel = mapper.Map<ParticipantEditModel>(participantDto);
         var result = await participantService.CreateAsync(participantModel, ct);
 
         return mapper.Map<ParticipantDto>(result);
     }
 
     [HttpPut("{id}")]
-    [Authorize("edit:participant-edit-own")]
     public async Task<ParticipantDto> Update(Guid id, [FromBody] ParticipantEditDto participantDto, CancellationToken ct)
-    {
-        var participantModel = await participantService.GetAsync(id, ct);
-        mapper.Map(participantDto, participantModel);
-
-        var result = await participantService.UpdateAsync(participantModel, ct);
+    {                                                         
+        var model = mapper.Map<ParticipantModel>(participantDto);
+        model.Id = id;
+        var result = await participantService.UpdateAsync(model, ct);
 
         return mapper.Map<ParticipantDto>(result);
     }

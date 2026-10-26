@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IRepositoryBase<Stage>, RepositoryBase<Stage>>();
 
         services.AddScoped<INominationRepository, NominationRepository>();
+        services.AddScoped<IMusicalInstrumentRepository, MusicalInstrumentRepository>();
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
 
         services.Decorate(typeof(IRepositoryBase<>), typeof(CachedRepositoryDecorator<>));

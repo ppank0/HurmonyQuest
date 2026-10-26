@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
+using ContestService.BLL.Interfaces;
 using ContestService.BLL.Mapper;
-using ContestService.BLL.Models;
+using ContestService.BLL.Models.MusicalInstrument;
+using ContestService.BLL.Models.Participant;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
@@ -24,7 +26,6 @@ public class ParticipantServiceTests
             cfg.AddProfile<MappingProfile>(); // та же конфигурация, что в BLL
         });
         _mapper = config.CreateMapper();
-
         _service = new ParticipantService(_repositoryMock.Object, _nominationRepoMock.Object, _mapper);
     }
 
@@ -32,36 +33,34 @@ public class ParticipantServiceTests
     public async Task CreateAsync_ShouldCreateParticipant_WhenInstrumentMatchesNomination()
     {
         // Arrange
-        var model = new ParticipantModel
+        var editModel = new ParticipantEditModel
         {
-            Id = Guid.NewGuid(),
             Name = "Anna",
             Surname = "Smith",
             Birthday = new DateOnly(2000, 1, 1),
             MusicalInstrumentId = Guid.NewGuid(),
             NominationId = Guid.NewGuid(),
-            UserId = Guid.NewGuid()
         };
+        var entity = _mapper.Map<Participant>(editModel);
+        entity.Id = Guid.NewGuid();
+        var model = _mapper.Map<ParticipantModel>(entity);
 
-        var entity = _mapper.Map<Participant>(model);
-
-        _nominationRepoMock.Setup(x => x.IsMusicalInstrumentInNomination(model.NominationId, model.MusicalInstrumentId)).Returns(true);
+         _nominationRepoMock.Setup(x => x.IsMusicalInstrumentInNomination(editModel.NominationId,editModel.MusicalInstrumentId)).Returns(true);
         _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Participant>(), It.IsAny<CancellationToken>())).ReturnsAsync(entity);
 
         // Act
-        var result = await _service.CreateAsync(model, CancellationToken.None);
+        var result = await _service.CreateAsync(editModel, CancellationToken.None);
 
         // Assert
         result.Should().BeEquivalentTo(model, options => options
             .Excluding(p => p.NominationId));
     }
 
-    [Fact]
+    [Fact] 
     public async Task CreateAsync_ShouldThrowBadRequest_WhenInstrumentDoesNotMatchNomination()
     {
-        var model = new ParticipantModel
+        var model = new ParticipantEditModel
         {
-            Id = Guid.NewGuid(),
             Name = "Anna",
             Surname = "Smith",
             Birthday = new DateOnly(2000, 1, 1),
@@ -114,19 +113,26 @@ public class ParticipantServiceTests
     public async Task GetAllAsync_ShouldReturnListOfParticipants()
     {
         //Arrange
+        var instrument = new MusicalInstrument
+        {
+            Id = Guid.NewGuid(),
+            Name = "instrument",
+            NominationId = Guid.NewGuid(),
+            Nomination = new Nomination { Id = Guid.NewGuid(), Name = "nomination" }
+        };
         var entities = new List<Participant> { new Participant
         {
             Id = Guid.NewGuid(),
             Name = "Anna",
             Surname = "Smith",
             Birthday = new DateOnly(2000, 1, 1),
-            MusicalInstrumentId = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            MusicalInstrumentId = instrument.Id,
+            MusicalInstrument = instrument,
+            UserId = Guid.NewGuid(),
         } };
         var models = _mapper.Map<List<ParticipantModel>>(entities);
 
-        _repositoryMock.Setup(r => r.GetAllWithRelationsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.GetAllWithDetails(It.IsAny<CancellationToken>())).ReturnsAsync(entities);
 
         //Act
         var result = await _service.GetAllAsync(CancellationToken.None);
@@ -139,25 +145,28 @@ public class ParticipantServiceTests
     public async Task GetAsync_ShouldReturnParticipant_WhenExists()
     {
         //Arrange
-        var id = Guid.NewGuid();
+        var instrument = new MusicalInstrument { Id = Guid.NewGuid(), Name = "instrument", NominationId = Guid.NewGuid(),
+            Nomination = new Nomination { Id = Guid.NewGuid(), Name = "nomination"}};
         var entity = new Participant
         {
             Id = Guid.NewGuid(),
             Name = "Anna",
             Surname = "Smith",
             Birthday = new DateOnly(2000, 1, 1),
-            MusicalInstrumentId = Guid.NewGuid(),
+            MusicalInstrumentId = instrument.Id,
+            MusicalInstrument = instrument,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
+        
+
+        _repositoryMock.Setup(r => r.GetByIdWithDetails(entity.Id, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(entity);
 
         var model = _mapper.Map<ParticipantModel>(entity);
 
-        _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Participant, bool>>>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync([entity]);
-
         //Act
-        var result = await _service.GetAsync(id, CancellationToken.None);
+        var result = await _service.GetAsync(entity.Id, CancellationToken.None);
 
         //Assert
         result.Should().BeEquivalentTo(model);
@@ -168,8 +177,8 @@ public class ParticipantServiceTests
     {
         //Arrange
         var id = Guid.NewGuid();
-        _repositoryMock.Setup(r => r.FindByConditionAsync(It.IsAny<Expression<Func<Participant, bool>>>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync([]);
+        _repositoryMock.Setup(r => r.GetByIdWithDetails(id, It.IsAny<CancellationToken>()))
+                       .ReturnsAsync((Participant?)null);
 
         //Act&Assert
         await Assert.ThrowsAsync<NotFoundException>(() => _service.GetAsync(id, CancellationToken.None));
@@ -210,7 +219,7 @@ public class ParticipantServiceTests
 
         //Assert
         result.Should().BeEquivalentTo(model, options => options
-    .Excluding(p => p.NominationId));
+        .Excluding(p => p.NominationId));
     }
 
     [Fact]
