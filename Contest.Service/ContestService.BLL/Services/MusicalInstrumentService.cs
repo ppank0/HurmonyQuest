@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
 using ContestService.BLL.Interfaces;
-using ContestService.BLL.Models;
+using ContestService.BLL.Models.MusicalInstrument;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
@@ -9,7 +9,7 @@ namespace ContestService.BLL.Services;
 
 public class MusicalInstrumentService(IMapper mapper, IMusicalInstrumentRepository instrumentRepo) : IMusicalInstrumentService
 {
-    public async Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct)
+    public async Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentEditModel musicalInstrument, CancellationToken ct)
     {
         var instrument = mapper.Map<MusicalInstrument>(musicalInstrument);
         var createdInstrument = await instrumentRepo.CreateAsync(instrument, ct);

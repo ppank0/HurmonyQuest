@@ -9,8 +9,7 @@ public class NominationRepository(AppDbContext context) : RepositoryBase<Nominat
 {
     public bool IsMusicalInstrumentInNomination(Guid nominationId, Guid musicalInstrumentId)
     {
-        return _context.Nominations.Any(n => n.Id == nominationId &&
-                            n.MusicalInstruments!.Any(i => i.Id == musicalInstrumentId));
+        return _context.Nominations.Any(n => n.Id == nominationId && n.MusicalInstruments!.Any(i => i.Id == musicalInstrumentId));
     }
 
     public async Task<List<Nomination>> GetAllAsync(CancellationToken ct)

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ContestService.BLL.Exceptions;
 using ContestService.BLL.Interfaces;
-using ContestService.BLL.Models;
+using ContestService.BLL.Models.Participant;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
@@ -11,7 +11,7 @@ public class ParticipantService(IParticipantRepository participantRepository,
         INominationRepository nominationRepository,
         IMapper mapper) : IParticipantService
 {
-    public async Task<ParticipantModel> CreateAsync(ParticipantModel model, CancellationToken ct)
+    public async Task<ParticipantModel> CreateAsync(ParticipantEditModel model, CancellationToken ct)
     {
         if (!nominationRepository.IsMusicalInstrumentInNomination(model.NominationId, model.MusicalInstrumentId))
         {

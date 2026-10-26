@@ -5,6 +5,8 @@ using ContestService.API.DTO.NominationDtos;
 using ContestService.API.DTO.ParticipantDtos;
 using ContestService.API.DTO.StageDtos;
 using ContestService.BLL.Models;
+using ContestService.BLL.Models.MusicalInstrument;
+using ContestService.BLL.Models.Participant;
 
 namespace ContestService.API.Mapper;
 
@@ -24,9 +26,11 @@ public class MappingProfile : Profile
         CreateMap<ParticipantDto, ParticipantModel>().ReverseMap();
         CreateMap<ParticipantEditDto, ParticipantModel>();
         CreateMap<ParticipantModel, ParticipantExtendedDto>();
+        CreateMap<ParticipantEditDto, ParticipantEditModel>();
 
         CreateMap<MusicalInstrumentDto, MusicalInstrumentModel>().ReverseMap();
         CreateMap<MusicalInstrumentEditDto, MusicalInstrumentModel>();
         CreateMap<MusicalInstrumentModel, MusicalInstrumentExtendedDto>();
+        CreateMap<MusicalInstrumentEditDto, MusicalInstrumentEditModel>();
     }
 }

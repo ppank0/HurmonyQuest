@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ContestService.API.DTO.MusicalInstrumentDtos;
 using ContestService.BLL.Interfaces;
-using ContestService.BLL.Models;
+using ContestService.BLL.Models.MusicalInstrument;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,7 @@ namespace ContestService.API.Controller;
 
 [Route("api/instruments")]
 [ApiController]
-//[Authorize]
+[Authorize]
 public class MusicalInstrumentController(IMusicalInstrumentService instrumentService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
@@ -33,7 +33,7 @@ public class MusicalInstrumentController(IMusicalInstrumentService instrumentSer
     [HttpPost]
     public async Task<MusicalInstrumentDto> Create([FromBody] MusicalInstrumentEditDto instrumentDto, CancellationToken ct)
     {
-        var instrument = mapper.Map<MusicalInstrumentModel>(instrumentDto);
+        var instrument = mapper.Map<MusicalInstrumentEditModel>(instrumentDto);
         var result = await instrumentService.CreateAsync(instrument, ct);
 
         return mapper.Map<MusicalInstrumentDto>(result);

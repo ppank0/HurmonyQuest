@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ContestService.API.DTO.ParticipantDtos;
 using ContestService.BLL.Interfaces;
-using ContestService.BLL.Models;
+using ContestService.BLL.Models.Participant;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,7 @@ namespace ContestService.API.Controller;
 
 [Route("api/participants")]
 [ApiController]
-//[Authorize]
+[Authorize]
 public class ParpicipantController(IParticipantService participantService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
@@ -30,10 +30,10 @@ public class ParpicipantController(IParticipantService participantService, IMapp
     }
 
     [HttpPost]
-    //[Authorize("CreateParticipant")]
+    [Authorize("CreateParticipant")]
     public async Task<ParticipantDto> Create([FromBody] ParticipantEditDto participantDto, CancellationToken ct)
     {
-        var participantModel = mapper.Map<ParticipantModel>(participantDto);
+        var participantModel = mapper.Map<ParticipantEditModel>(participantDto);
         var result = await participantService.CreateAsync(participantModel, ct);
 
         return mapper.Map<ParticipantDto>(result);
@@ -41,11 +41,10 @@ public class ParpicipantController(IParticipantService participantService, IMapp
 
     [HttpPut("{id}")]
     public async Task<ParticipantDto> Update(Guid id, [FromBody] ParticipantEditDto participantDto, CancellationToken ct)
-    {
-        var participantModel = await participantService.GetAsync(id, ct);
-        mapper.Map(participantDto, participantModel);
-
-        var result = await participantService.UpdateAsync(participantModel, ct);
+    {                                                         
+        var model = mapper.Map<ParticipantModel>(participantDto);
+        model.Id = id;
+        var result = await participantService.UpdateAsync(model, ct);
 
         return mapper.Map<ParticipantDto>(result);
     }
