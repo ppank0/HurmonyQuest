@@ -2,6 +2,7 @@
 using ContestService.BLL.Exceptions;
 using ContestService.BLL.Mapper;
 using ContestService.BLL.Models;
+using ContestService.BLL.Models.MusicalInstrument;
 using ContestService.BLL.Services;
 using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
@@ -14,7 +15,7 @@ public class NominationServiceTests
 {
     private readonly NominationService _nominationService;
     private readonly IMapper _mapper;
-    private readonly Mock<IRepositoryBase<Nomination>> _repositoryMock;
+    private readonly Mock<INominationRepository> _repositoryMock;
 
     public NominationServiceTests()
     {
@@ -24,7 +25,7 @@ public class NominationServiceTests
         });
         _mapper = config.CreateMapper();
 
-        _repositoryMock = new Mock<IRepositoryBase<Nomination>>();
+        _repositoryMock = new Mock<INominationRepository>();
         _nominationService = new NominationService(_repositoryMock.Object, _mapper);
     }
 
@@ -36,7 +37,8 @@ public class NominationServiceTests
         var model = new NominationModel
         {
             Id = Guid.NewGuid(),
-            Name = "Test"
+            Name = "Test",
+            MusicalInstruments = new List<MusicalInstrumentModel>(),
         };
 
         var entity = _mapper.Map<Nomination>(model);
@@ -98,13 +100,13 @@ public class NominationServiceTests
         var ct = CancellationToken.None;
         var entities = new List<Nomination>
         {
-            new() { Id = Guid.NewGuid(), Name = "Solo", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new() { Id = Guid.NewGuid(), Name = "Duet", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new() { Id = Guid.NewGuid(), Name = "Solo", MusicalInstruments = new List<MusicalInstrument>() },
+            new() { Id = Guid.NewGuid(), Name = "Duet", MusicalInstruments = new List<MusicalInstrument>()}
         };
 
         var models = _mapper.Map<List<NominationModel>>(entities);
 
-        _repositoryMock.Setup(r => r.GetAllToListAsync(ct)).ReturnsAsync(entities);
+        _repositoryMock.Setup(r => r.GetAllAsync(ct)).ReturnsAsync(entities);
 
         // Act
         var result = await _nominationService.GetAllAsync(ct);
@@ -118,17 +120,18 @@ public class NominationServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var entity = new Nomination { Id = id, Name = "Group", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+        var entity = new Nomination { Id = id, Name = "Group", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow,
+            MusicalInstruments = new List<MusicalInstrument>()};
 
         _repositoryMock.Setup(r =>
-            r.FindByConditionAsync(It.IsAny<Expression<Func<Nomination, bool>>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Nomination> { entity });
+            r.GetByIdWithInstrumentsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entity);
 
         // Act
         var result = await _nominationService.GetAsync(id, CancellationToken.None);
 
         // Assert
-        result.Should().BeEquivalentTo(new NominationModel { Id = id, Name = "Group" });
+        result.Should().BeEquivalentTo(new NominationModel { Id = id, Name = "Group", MusicalInstruments = new List<MusicalInstrumentModel>() });
     }
 
     [Fact]
@@ -151,8 +154,9 @@ public class NominationServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var model = new NominationModel { Id = id, Name = "Updated Name" };
-        var entity = new Nomination { Id = id, Name = "Old Name", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+        var model = new NominationModel { Id = id, Name = "Updated Name", MusicalInstruments = new List<MusicalInstrumentModel>()};
+        var entity = new Nomination { Id = id, Name = "Old Name", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow, 
+            MusicalInstruments = new List<MusicalInstrument>() };
         var updatedEntity = _mapper.Map<Nomination>(model);
 
         _repositoryMock.Setup(r =>
