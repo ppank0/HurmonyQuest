@@ -50,4 +50,4 @@ jobs:
     env: 
         EXCLUDE_FROM_COVERAGE: "**/Program.cs, **/Extensions/*, **/Exceptions/**, **/Context/*, **/Interceptors/*, **/Migrations/*, **/DI/*, **/Entities/*, **/Validators/*, **/Enums/**/*, **/DTOs/*, **/Interfaces/*, **/Repositories/**, **/MappingConfigurations/*, **/ViewModels/**/*, **/Controller/*, **/Utilities/**, **/EventBus/**, **/Authorization/*"
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        EXCLUDE_FROM_SONAR: "**/Migrations/*, **/Dockerfile"
+        EXCLUDE_FROM_SONAR: "**/Migrations/*, **/Dockerfile, hq-frontend/**"

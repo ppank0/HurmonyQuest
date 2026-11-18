@@ -4,7 +4,7 @@ export const About = () => {
    
     return (
         <Box >
-            <h1>ABOUT PAGE</h1>
+            <h1>- ABOUT PAGE -</h1>
         </Box>
     ) 
 }
