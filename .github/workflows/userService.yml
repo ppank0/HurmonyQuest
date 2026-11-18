@@ -31,9 +31,14 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
 
     - name: Sonar Scan
-      uses: highbyte/sonarscan-dotnet@v2.3.0
+      uses: highbyte/sonarscan-dotnet@8642efb8793ae4a89bd1e6cdf0a1aef1e582f9bb #2.5.1
       with:
         sonarProjectKey: ${{ vars.SONARPROJECTKEY }}
         sonarProjectName: ${{ vars.SONARPROJECTNAME }}
