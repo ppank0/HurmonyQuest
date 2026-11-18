@@ -1,4 +1,4 @@
-﻿using ContestService.BLL.Models;
+﻿using ContestService.BLL.Models.MusicalInstrument;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ public interface IMusicalInstrumentService
     Task<List<MusicalInstrumentModel>> GetAllAsync(CancellationToken ct);
     Task<MusicalInstrumentModel> GetAsync(Guid id, CancellationToken ct);
     Task DeleteAsync(Guid id, CancellationToken ct);
-    Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentModel musicalInstrument, CancellationToken ct);
+    Task<MusicalInstrumentModel> CreateAsync(MusicalInstrumentEditModel musicalInstrument, CancellationToken ct);
     Task<MusicalInstrumentModel> UpdateAsync(MusicalInstrumentModel model, CancellationToken ct);
 
 }

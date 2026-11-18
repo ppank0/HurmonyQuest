@@ -8,5 +8,6 @@ public record ParticipantEditDto
     string Surname,
     DateOnly Birthday,
     Guid? MusicalInstrumentId,
-    Guid? NominationId
+    Guid? NominationId,
+    Guid UserId
 );
