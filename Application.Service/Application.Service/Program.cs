@@ -1,4 +1,5 @@
 using Application.Service.DI;
+using Serilog;
 
 namespace Application.Service
 {
@@ -7,6 +8,7 @@ namespace Application.Service
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
             // Add services to the container.
 
@@ -18,6 +20,7 @@ namespace Application.Service
             builder.Services.AddApiDependencies(builder.Configuration);
             var app = builder.Build();
 
+            app.UseSerilogRequestLogging();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

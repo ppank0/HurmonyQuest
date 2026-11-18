@@ -11,14 +11,16 @@ using ApplicationService.DAL.UnitOfWork;
 using AutoMapper;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SharedModels.Contracts.Applications;
 using SharedModels.Contracts.Applications.Data;
+using System.Diagnostics.Metrics;
 
 namespace ApplicationService.BLL.Services
 {
     public class ApplicationService(IMapper mapper, IUnitOfWork unitOfWork,
         IParticipantHttpClient participantClient, IInstrumentHttpClient instrumentClient, IVideoService videoService,
-        IPublishEndpoint publishEndpoint) : IApplicationService
+        IPublishEndpoint publishEndpoint, ILogger<ApplicationService> logger) : IApplicationService
     {
         public async Task<ApplicationModel> CreateAsync(CreateApplicationRequest request, CancellationToken ct)
         {
@@ -36,6 +38,8 @@ namespace ApplicationService.BLL.Services
 
             await unitOfWork.Applications.CreateAsync(appEntity, ct);
             await unitOfWork.SaveAsync(ct);
+            logger.LogInformation("Application for participant: {ParticipantId} was successfully created with id: {ApplicationId}", participant.Id, appEntity.Id);
+
             await publishEndpoint.Publish<IApplicationEvent>(new
             {
                 UserId = participant.Id,
@@ -43,7 +47,6 @@ namespace ApplicationService.BLL.Services
                 ApplicationData = new ApplicationData(participant.Name, participant.Surname,
                     ApplicationStatus.RendingReview.ToString(), instrument.Name),
             }, ct);
-
             return new ApplicationModel()
             {
                 Id = appEntity.Id,
@@ -68,6 +71,7 @@ namespace ApplicationService.BLL.Services
             await videoService.DeleteAsync(application.VideoId, ct);
 
             await unitOfWork.SaveAsync(ct);
+            logger.LogInformation("Application wit id: {ApplicationId} was deleted", application.Id);
 
             await publishEndpoint.Publish<IApplicationEvent>(new
             {
