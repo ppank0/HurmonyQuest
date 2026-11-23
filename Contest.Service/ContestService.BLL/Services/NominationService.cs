@@ -6,7 +6,7 @@ using ContestService.DAL.Entities;
 using ContestService.DAL.Repositories.Interfaces;
 
 namespace ContestService.BLL.Services;
-public class NominationService(IRepositoryBase<Nomination> repository, IMapper mapper) : INominationService
+public class NominationService(INominationRepository repository, IMapper mapper) : INominationService
 {
     public async Task<NominationModel> CreateAsync(NominationModel nomination, CancellationToken ct)
     {
@@ -33,22 +33,22 @@ public class NominationService(IRepositoryBase<Nomination> repository, IMapper m
 
     public async Task<List<NominationModel>> GetAllAsync(CancellationToken ct)
     {
-        var entitiesList = await repository.GetAllToListAsync(ct);
+        var entitiesList = await repository.GetAllAsync(ct);
 
         return mapper.Map<List<NominationModel>>(entitiesList);
     }
 
     public async Task<NominationModel> GetAsync(Guid id, CancellationToken ct)
     {
-        var nominationList = await repository.FindByConditionAsync(s => s.Id == id, ct);
-        var nomination = nominationList.FirstOrDefault();
+        var nomination = await repository.GetByIdWithInstrumentsAsync(id, ct);
 
         if (nomination is null)
         {
             throw new NotFoundException($"Nomination with id {id} was not found");
         }
 
-        return new NominationModel { Id = nomination.Id, Name = nomination.Name };
+        return mapper.Map<NominationModel>(nomination);
+
     }
 
     public async Task<NominationModel> UpdateAsync(NominationModel nomination, CancellationToken ct)
